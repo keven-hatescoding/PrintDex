@@ -16,7 +16,7 @@ from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 
-from printdex.config import GEMINI_MAX_RPM, UNKNOWN_FOLDER
+from printdex.config import GEMINI_MAX_RPM
 from printdex.core.organizer import Cancelled, OrganizeResult, organize_file
 from printdex.core.watcher import FolderMonitor
 from printdex.locales import Msg
@@ -240,7 +240,9 @@ class MonitorService:
             self._on_log(Msg("log.success", path=folders, files=files))
             self._count("organized")
         else:
-            self._on_log(Msg("log.ai_error", folder=UNKNOWN_FOLDER, files=files,
+            # A pasta de falha depende do idioma (Unknown / Desconhecidos)
+            unknown_folder = os.path.basename(os.path.dirname(result.destination))
+            self._on_log(Msg("log.ai_error", folder=unknown_folder, files=files,
                              reason=result.ai_error))
             self._count("unknown")
         if self._on_organized:

@@ -39,7 +39,7 @@ Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your D
 ## ✨ Core Features
 
 - 🤖 **AI Auto-Organizer (powered by Google Gemini)** — Watches your Downloads folder in real time. When a 3D file finishes downloading, Gemini reads its file name, identifies the universe it belongs to and moves it to `PRINTS / Category / Franchise / Item type / Clean name.ext`. Files downloaded while the app was closed are picked up on the next start.
-- 🗂️ **Locked, consistent categories** — The AI can only use 8 fixed top-level folders, so the same character never ends up in three different places. Folder names are in Portuguese: `Animes e Mangas` (anime & manga), `Filmes e Series` (movies & series), `Jogos` (games), `Utilitarios e Ferramentas` (utilities & tools), `Decoracao` (decoration), `Automotivo` (automotive), `Cosplay e Acessorios` (cosplay & accessories) and `Outros` (others).
+- 🗂️ **Locked, consistent categories** — The AI can only use 8 fixed top-level folders, so the same character never ends up in three different places: `Anime & Manga`, `Movies & TV Shows`, `Games`, `Utilities & Tools`, `Decoration`, `Automotive`, `Cosplay & Accessories` and `Others`. Folder names follow the app language — English by default (also used for Chinese) and Portuguese when the app is set to PT-BR.
 - 🧬 **Smart Deduplication** — Before saving, PrintDex compares the new file byte-for-byte with what is already in the library. Identical downloads are discarded instead of piling up as `file (1)`, `file (2)`… saving disk space.
 - 🧮 **Advanced 3D Print Calculator** — A *Simple* mode for a quick quote (filament + energy + margin) and an *Advanced* dashboard with machine depreciation, manual labor, failure risk, quantity and a visual cost breakdown. Results update as you type.
 - 📚 **Visual Library** — Browse your collection as cards with themed icons, jump straight to any folder in Explorer with the **Local Files** button, and open a model in your slicer with one click.
@@ -62,7 +62,7 @@ Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your D
 **Requirements:** Windows 10 or 11 (64-bit) and a free Google Gemini API key. Nothing else — Python and every library are bundled in the installer.
 
 1. Open the [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases) page.
-2. Under **Assets**, download **`PrintDex-1.0BETA-INSTALL.exe`**.
+2. Under **Assets**, download **`PrintDex-1.1-BETA-INSTALL.exe`**.
 3. Run it, choose your language and follow the wizard. PrintDex is installed in `C:\Program Files (x86)\PrintDex`, and its library folder `PRINTS` is created there with write permission for your user — no need to run the app as administrator.
 
 > [!WARNING]
@@ -121,7 +121,7 @@ Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta D
 ## ✨ Funcionalidades
 
 - 🤖 **Organizador automático com IA (Google Gemini)** — Monitora a pasta Downloads em tempo real. Quando um arquivo 3D termina de baixar, o Gemini lê o nome do arquivo, identifica o universo a que ele pertence e o move para `PRINTS / Categoria / Franquia / Tipo de item / Nome limpo.ext`. Arquivos baixados com o app fechado são processados na próxima vez que ele abrir.
-- 🗂️ **Categorias fixas e consistentes** — A IA só pode usar 8 pastas principais (`Animes e Mangas`, `Filmes e Series`, `Jogos`, `Utilitarios e Ferramentas`, `Decoracao`, `Automotivo`, `Cosplay e Acessorios` e `Outros`), então o mesmo personagem nunca vai parar em três lugares diferentes.
+- 🗂️ **Categorias fixas e consistentes** — A IA só pode usar 8 pastas principais, então o mesmo personagem nunca vai parar em três lugares diferentes. Com o app em português: `Animes e Mangas`, `Filmes e Series`, `Jogos`, `Utilitarios e Ferramentas`, `Decoracao`, `Automotivo`, `Cosplay e Acessorios` e `Outros`. Em inglês (padrão, usado também para o chinês), as pastas ficam em inglês (`Anime & Manga`, `Games`…).
 - 🧬 **Deduplicação inteligente** — Antes de salvar, o PrintDex compara o novo arquivo byte a byte com o que já está na biblioteca. Downloads idênticos são descartados em vez de se acumularem como `arquivo (1)`, `arquivo (2)`…, economizando espaço em disco.
 - 🧮 **Calculadora de Impressão 3D** — Um *Modo Simples* para orçamentos rápidos (filamento + energia + margem) e um *Modo Avançado* com depreciação da máquina, trabalho manual, risco de falha, quantidade e a anatomia visual do custo. Os resultados mudam enquanto você digita.
 - 📚 **Biblioteca visual** — Navegue pela coleção em cards com ícones temáticos, abra qualquer pasta no Explorer pelo botão **Arquivos Locais** e abra um modelo no seu fatiador com um clique.
@@ -133,7 +133,7 @@ Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta D
 **Requisitos:** Windows 10 ou 11 (64 bits) e uma API Key gratuita do Google Gemini. Mais nada: o Python e todas as bibliotecas já vêm dentro do instalador.
 
 1. Abra a página de [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases).
-2. Em **Assets**, baixe o **`PrintDex-1.0BETA-INSTALL.exe`**.
+2. Em **Assets**, baixe o **`PrintDex-1.1-BETA-INSTALL.exe`**.
 3. Execute, escolha o idioma e siga o assistente. O PrintDex é instalado em `C:\Program Files (x86)\PrintDex`, e a pasta da biblioteca, `PRINTS`, é criada ali com permissão de escrita para o seu usuário — não é preciso abrir o app como administrador.
 
 > [!WARNING]

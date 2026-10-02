@@ -2,10 +2,13 @@
 
 Estrutura gerada (3 níveis, baseada em franquias):
     PRINTS / categoria_principal / franquia / tipo_item / nome_limpo.ext
-    ex.: PRINTS / Animes e Mangas / Dragon Ball / Busto / Vegeta.stl
+    ex. (inglês):    PRINTS / Anime & Manga / Dragon Ball / Bust / Vegeta.stl
+    ex. (português): PRINTS / Animes e Mangas / Dragon Ball / Busto / Vegeta.stl
 
-A categoria é sempre uma das CATEGORIES (lista fechada no prompt, no schema
-e conferida no código); franquia e tipo de item são livres.
+Os nomes das pastas seguem o idioma da interface no momento de cada
+requisição (FOLDER_NAMES): inglês é o padrão e vale também para o chinês. A
+categoria é sempre uma da lista do idioma (fechada no prompt, no schema e
+conferida no código); franquia e tipo de item são livres.
 
 `organize_file()` é síncrona e bloqueia por 1-3 s (rede), ou mais quando o
 limite de chamadas por minuto (GEMINI_MAX_RPM) foi atingido. Ela deve ser
@@ -33,7 +36,7 @@ from typing import Literal, NamedTuple
 import httpx
 from google import genai
 from google.genai import errors, types
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, create_model
 
 from printdex.config import (
     GEMINI_ATTEMPTS,
@@ -41,46 +44,82 @@ from printdex.config import (
     GEMINI_MODEL,
     GEMINI_TIMEOUT_MS,
     SUPPORTED_EXTENSIONS,
-    UNKNOWN_FOLDER,
 )
-from printdex.locales import Msg
+from printdex.locales import Msg, get_language
 
-# Únicas categorias permitidas (1º nível de pastas). A IA não pode criar
-# outras: sem isso ela espalhava a mesma coisa em "Cultura Pop",
-# "Personagens", "Miniaturas/Anime"...
-CATEGORIES = (
-    "Animes e Mangas",
-    "Filmes e Series",
-    "Jogos",
-    "Utilitarios e Ferramentas",
-    "Decoracao",
-    "Automotivo",
-    "Cosplay e Acessorios",
-    "Outros",
-)
-OTHER_CATEGORY = "Outros"  # destino se a IA, mesmo assim, fugir da lista
+
+@dataclass(frozen=True)
+class FolderNames:
+    """Nomes das pastas que a IA e o app criam, num idioma."""
+
+    # Únicas categorias permitidas (1º nível). Sem a lista fechada a IA
+    # espalhava a mesma coisa em "Cultura Pop", "Personagens"... A ORDEM é a
+    # mesma em todos os idiomas (serve para traduzir uma categoria).
+    categories: tuple[str, ...]
+    anime: str                     # categoria obrigatória de personagens de anime
+    other: str                     # destino se a IA, mesmo assim, fugir da lista
+    unknown: str                   # quando a IA falha
+    no_franchise: str              # modelo sem franquia
+    item_examples: tuple[str, ...]  # exemplos de tipo de item no prompt
+    language: str                  # idioma, como dito ao modelo no prompt
+
+
+FOLDER_NAMES = {
+    "en": FolderNames(
+        categories=("Anime & Manga", "Movies & TV Shows", "Games", "Utilities & Tools",
+                    "Decoration", "Automotive", "Cosplay & Accessories", "Others"),
+        anime="Anime & Manga", other="Others", unknown="Unknown", no_franchise="General",
+        item_examples=("Miniature", "Bust", "Stand"), language="inglês",
+    ),
+    "pt_BR": FolderNames(
+        categories=("Animes e Mangas", "Filmes e Series", "Jogos", "Utilitarios e Ferramentas",
+                    "Decoracao", "Automotivo", "Cosplay e Acessorios", "Outros"),
+        anime="Animes e Mangas", other="Outros", unknown="Desconhecidos", no_franchise="Geral",
+        item_examples=("Miniatura", "Busto", "Suporte"), language="português",
+    ),
+}
+FOLDER_FALLBACK = "en"  # chinês (e qualquer outro idioma) usa as pastas em inglês
+
+
+def folder_names(language: str | None = None) -> FolderNames:
+    """Vocabulário de pastas do idioma (o idioma atual da interface, se omitido)."""
+    return FOLDER_NAMES.get(language or get_language(), FOLDER_NAMES[FOLDER_FALLBACK])
+
 
 PROMPT_TEMPLATE = (
     "És um classificador avançado de ficheiros para impressão 3D. Analisa o "
     "nome deste ficheiro e identifica a que universo/franquia ele pertence. "
     "Deves retornar ÚNICA e EXCLUSIVAMENTE um objeto JSON válido contendo: "
-    "'categoria_principal', 'franquia' (usa 'Geral' se não pertencer a "
+    "'categoria_principal', 'franquia' (usa '{no_franchise}' se não pertencer a "
     "nenhuma), 'tipo_item' (a utilidade ou formato da peça) e 'nome_limpo'. "
     "Ignora extensões e números de versão.\n\n"
     "CLASSIFICAÇÃO OBRIGATÓRIA: A 'categoria_principal' deve ser EXATAMENTE "
-    "UMA destas opções: " + ", ".join(f"'{name}'" for name in CATEGORIES) + ". "
+    "UMA destas opções: {categories}. "
     "Nunca crie uma categoria nova. Se for um personagem de anime (ex: Vegeta, "
-    "Zoro, Midoriya), coloque SEMPRE em 'Animes e Mangas'. Na chave "
+    "Zoro, Midoriya), coloque SEMPRE em '{anime}'. Na chave "
     "'franquia', coloque o universo (ex: 'Dragon Ball', 'One Piece'). Na chave "
-    "'tipo_item', coloque o formato (ex: 'Miniatura', 'Busto', 'Suporte').\n\n"
+    "'tipo_item', coloque o formato (ex: {item_examples}), escrito em {language}.\n\n"
     "Ficheiro: {nome_do_arquivo}"
 )
 
-NO_FRANCHISE = "Geral"
-# Variações que a IA às vezes usa no lugar de "Geral" (comparadas via _fold)
+
+def build_prompt(file_name: str, names: FolderNames) -> str:
+    """O prompt com a lista de categorias e os exemplos do idioma."""
+    return PROMPT_TEMPLATE.format(
+        no_franchise=names.no_franchise,
+        categories=", ".join(f"'{name}'" for name in names.categories),
+        anime=names.anime,
+        item_examples=", ".join(f"'{name}'" for name in names.item_examples),
+        language=names.language,
+        nome_do_arquivo=file_name,
+    )
+
+
+# Variações que a IA às vezes usa no lugar de "sem franquia" (comparadas via _fold)
 _NO_FRANCHISE_ALIASES = {
-    "geral", "nenhuma", "nenhum", "sem franquia", "none", "null", "n/a", "na",
-    "-", "generico", "generica", "desconhecida", "desconhecido",
+    "geral", "general", "nenhuma", "nenhum", "sem franquia", "no franchise", "none",
+    "null", "n/a", "na", "-", "generico", "generica", "generic", "desconhecida",
+    "desconhecido", "unknown",
 }
 
 MOVE_ATTEMPTS = 5          # arquivo em uso: tenta de novo algumas vezes
@@ -101,28 +140,29 @@ _WINDOWS_RESERVED = {
 _move_lock = threading.Lock()
 
 
-class Classificacao(BaseModel):
-    """Schema enviado ao Gemini. As descrições também orientam o modelo.
+@lru_cache(maxsize=None)
+def response_schema(names: FolderNames) -> type[BaseModel]:
+    """Schema enviado ao Gemini, montado para o idioma da requisição.
 
     `categoria_principal` é um Literal: o SDK o envia como enum, e a API só
-    consegue gerar um dos valores da lista.
+    consegue gerar um dos valores da lista do idioma. As descrições também
+    orientam o modelo.
     """
-
-    categoria_principal: Literal[*CATEGORIES] = Field(description=(
-        "Exatamente uma das categorias permitidas. Personagens de anime "
-        "(ex.: Vegeta, Zoro, Midoriya) vão sempre em 'Animes e Mangas'"
-    ))
-    franquia: str = Field(description=(
-        "Universo, franquia ou marca a que o modelo pertence. Ex.: Dragon "
-        "Ball, One Piece, Harry Potter, Porsche. Obrigatoriamente 'Geral' se "
-        "não pertencer a nenhuma"
-    ))
-    tipo_item: str = Field(description=(
-        "Formato ou utilidade da peça. Ex.: Miniatura, Busto, Suporte"
-    ))
-    nome_limpo: str = Field(description=(
-        "Nome bem formatado para o ficheiro, sem extensão nem número de versão"
-    ))
+    return create_model(
+        "Classificacao",
+        categoria_principal=(Literal[*names.categories], Field(description=(
+            "Exatamente uma das categorias permitidas. Personagens de anime "
+            f"(ex.: Vegeta, Zoro, Midoriya) vão sempre em '{names.anime}'"))),
+        franquia=(str, Field(description=(
+            "Universo, franquia ou marca a que o modelo pertence. Ex.: Dragon "
+            "Ball, One Piece, Harry Potter, Porsche. Obrigatoriamente "
+            f"'{names.no_franchise}' se não pertencer a nenhuma"))),
+        tipo_item=(str, Field(description=(
+            f"Formato ou utilidade da peça, em {names.language}. "
+            f"Ex.: {', '.join(names.item_examples)}"))),
+        nome_limpo=(str, Field(description=(
+            "Nome bem formatado para o ficheiro, sem extensão nem número de versão"))),
+    )
 
 
 class ClassificationError(Exception):
@@ -246,27 +286,29 @@ def sanitize_name(name: object, max_length: int = MAX_FOLDER_NAME) -> str:
     return name
 
 
-def _clean_franchise(franquia: object) -> str:
-    """Franquia sanitizada; qualquer forma de "nenhuma" vira "Geral"."""
+def _clean_franchise(franquia: object, names: FolderNames) -> str:
+    """Franquia sanitizada; qualquer forma de "nenhuma" vira "General"/"Geral"."""
     if not isinstance(franquia, str) or _fold(franquia.strip()) in _NO_FRANCHISE_ALIASES:
-        return NO_FRANCHISE
-    return sanitize_name(franquia) or NO_FRANCHISE
+        return names.no_franchise
+    return sanitize_name(franquia) or names.no_franchise
 
 
-def _canonical_category(value: object) -> str | None:
-    """A categoria da lista fixa, com a grafia exata dela.
+def _canonical_category(value: object, names: FolderNames) -> str | None:
+    """A categoria da lista do idioma, com a grafia exata dela.
 
-    Aceita diferença de maiúsculas e acentos ("animes e mangás"). Uma
-    categoria fora da lista vira "Outros" (nunca uma pasta nova); vazia
-    retorna None (resposta incompleta da IA).
+    Aceita diferença de maiúsculas e acentos ("animes e mangás") e traduz uma
+    categoria que veio no outro idioma ("Jogos" -> "Games"). Fora da lista
+    vira "Others"/"Outros" (nunca uma pasta nova); vazia retorna None
+    (resposta incompleta da IA).
     """
     if not isinstance(value, str) or not value.strip():
         return None
     key = _fold(value.strip())
-    for category in CATEGORIES:
-        if _fold(category) == key:
-            return category
-    return OTHER_CATEGORY
+    for vocabulary in (names, *FOLDER_NAMES.values()):
+        for index, category in enumerate(vocabulary.categories):
+            if _fold(category) == key:
+                return names.categories[index]
+    return names.other
 
 
 def _clean_file_stem(nome_limpo: object) -> str:
@@ -281,20 +323,23 @@ def _clean_file_stem(nome_limpo: object) -> str:
 
 
 def classify(file_name: str, api_key: str,
-             cancel: threading.Event | None = None) -> Classification:
+             cancel: threading.Event | None = None,
+             names: FolderNames | None = None) -> Classification:
     """Pergunta ao Gemini como classificar e renomear o arquivo.
 
+    `names`: vocabulário de pastas (padrão: o do idioma atual da interface).
     Respeita GEMINI_MAX_RPM; lança Cancelled se `cancel` for setado enquanto
     espera a vez.
     """
+    names = names or folder_names()
     _rate_limiter.wait(cancel)
     try:
         response = _get_client(api_key).models.generate_content(
             model=GEMINI_MODEL,
-            contents=PROMPT_TEMPLATE.format(nome_do_arquivo=file_name),
+            contents=build_prompt(file_name, names),
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",  # sem markdown em volta
-                response_schema=Classificacao,
+                response_schema=response_schema(names),
                 # temperature fica no padrão (1.0): o Google recomenda não
                 # reduzi-la nos modelos Gemini 3, sob risco de piorar a qualidade
                 # Sem ferramentas: desliga o AFC (e o aviso que o SDK emite)
@@ -323,15 +368,15 @@ def classify(file_name: str, api_key: str,
         raise ClassificationError(Msg("ai.unexpected_json", text=repr(text[:120])))
 
     # O enum do schema já obriga a API a usar a lista; isto é a rede de segurança
-    categoria = _canonical_category(data.get("categoria_principal"))
+    categoria = _canonical_category(data.get("categoria_principal"), names)
     tipo_item = sanitize_name(data.get("tipo_item"))
     if not categoria or not tipo_item:
         raise ClassificationError(Msg("ai.missing_fields", text=repr(text[:120])))
 
-    # franquia vazia vira "Geral"; nome_limpo vazio mantém o nome original
+    # franquia vazia vira "General"/"Geral"; nome_limpo vazio mantém o nome original
     return Classification(
         categoria_principal=categoria,
-        franquia=_clean_franchise(data.get("franquia")),
+        franquia=_clean_franchise(data.get("franquia"), names),
         tipo_item=tipo_item,
         nome_limpo=_clean_file_stem(data.get("nome_limpo")),
     )
@@ -474,20 +519,23 @@ def move_file(src: str, dest_root: str, folders: Sequence[str] = (),
 
 def organize_file(
     file_name: str, file_path: str, dest_root: str, api_key: str,
-    cancel: threading.Event | None = None,
+    cancel: threading.Event | None = None, language: str | None = None,
 ) -> OrganizeResult:
     """Classifica o arquivo com a IA e o move para
     `dest_root / categoria_principal / franquia / tipo_item / nome_limpo.ext`.
 
-    Se a IA falhar, move para `dest_root / Desconhecidos` com o nome original.
-    Erros ao mover (arquivo sumiu, em uso, sem permissão) são propagados como
-    OSError e o arquivo continua na pasta de origem. Se `cancel` for setado
-    antes da chamada à API, lança Cancelled sem tocar no arquivo.
+    Os nomes das pastas seguem `language` (padrão: o idioma atual da
+    interface). Se a IA falhar, move para `dest_root / Unknown` (ou
+    Desconhecidos) com o nome original. Erros ao mover (arquivo sumiu, em uso,
+    sem permissão) são propagados como OSError e o arquivo continua na pasta
+    de origem. Se `cancel` for setado antes da chamada à API, lança Cancelled
+    sem tocar no arquivo.
     """
+    names = folder_names(language)  # um idioma só do início ao fim do arquivo
     try:
-        result = classify(file_name, api_key, cancel)
+        result = classify(file_name, api_key, cancel, names)
     except ClassificationError as exc:
-        moved = move_file(file_path, dest_root, (UNKNOWN_FOLDER,))
+        moved = move_file(file_path, dest_root, (names.unknown,))
         return OrganizeResult(destination=moved.path, ai_error=exc.msg,
                               duplicate=moved.duplicate)
 

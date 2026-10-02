@@ -77,5 +77,5 @@ GEMINI_ATTEMPTS = 3  # novas tentativas automáticas em 429/5xx
 # real em AI Studio > Rate limits e ajuste (no nível pago pode ser bem maior).
 GEMINI_MAX_RPM = 10
 
-# Pasta usada quando a IA falha
-UNKNOWN_FOLDER = "Desconhecidos"
+# Os nomes das pastas criadas pela IA (categorias, "Unknown"/"Desconhecidos",
+# "General"/"Geral") seguem o idioma: veja FOLDER_NAMES em core/organizer.py
