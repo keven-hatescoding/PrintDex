@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Ambientes virtuais e segredos
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Banco de dados (contém a API key e caminhos pessoais). Ele fica em
+# %APPDATA%\PrintDex; "data/" é o local de versões antigas do app.
+printdex.db
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+data/
+
+# Logs e relatórios
+*.log
+
+# IDEs / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,9 @@
+customtkinter>=5.2
+# Desenha os ícones coloridos da Biblioteca (o CustomTkinter não o instala)
+pillow>=10.0
+watchdog>=4.0
+# Ícone na bandeja do Windows (área de notificação)
+pystray>=0.19
+platformdirs>=4.0
+# SDK atual do Gemini (o pacote antigo "google-generativeai" foi descontinuado)
+google-genai>=2.0
