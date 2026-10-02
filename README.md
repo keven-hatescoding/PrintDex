@@ -32,7 +32,7 @@
 ---
 
 <p align="center">
-  <img src="docs/screenshots/library.png" alt="PrintDex Library" width="880">
+  <img src="docs/screenshots/library-en.png" alt="PrintDex Library" width="880">
 </p>
 
 Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your Downloads folder turns into a graveyard of `final_v2_FIXED (3).stl`. **PrintDex** watches that folder for you, asks Google Gemini what each model is, and files it into a clean, browsable library: **category → franchise → item type**, with a tidy file name. It also tells you how much to charge for each print.
@@ -59,8 +59,8 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/dashboard.png" alt="Dashboard"></td>
-    <td><img src="docs/screenshots/calculator-advanced.png" alt="Advanced calculator"></td>
+    <td><img src="docs/screenshots/dashboard-en.png" alt="Dashboard"></td>
+    <td><img src="docs/screenshots/calculator-advanced-en.png" alt="Advanced calculator"></td>
   </tr>
   <tr>
     <td align="center"><em>Dashboard — real-time activity</em></td>
