@@ -17,6 +17,7 @@
 </p>
 
 <p align="center">
+  <a href="#-whats-new">What's New</a> •
   <a href="#-core-features">Features</a> •
   <a href="#-installation--getting-started">Installation</a> •
   <a href="#-how-to-use--first-setup">How to use</a> •
@@ -35,6 +36,16 @@
 </p>
 
 Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your Downloads folder turns into a graveyard of `final_v2_FIXED (3).stl`. **PrintDex** watches that folder for you, asks Google Gemini what each model is, and files it into a clean, browsable library: **category → franchise → item type**, with a tidy file name. It also tells you how much to charge for each print.
+
+## 📝 What's New
+
+**1.1-BETA** (hotfix) — changes since 1.0BETA:
+
+- 🌍 **Folder names now follow the app language.** In 1.0BETA, every folder created by the AI was in Portuguese, whatever language you used. Now categories, item types and the `Unknown` / `General` folders are created in **English** by default (also when the app is in 简体中文) and in **Portuguese** when the app is set to PT-BR.
+- 🔒 The category list of your language is sent to Gemini and locked in the response schema on every request. If the AI still answers in the other language (e.g. `Jogos` instead of `Games`), PrintDex translates it instead of creating a duplicate folder.
+- ℹ️ Models already organized by 1.0BETA stay where they are. The new installer upgrades 1.0BETA in place and keeps your settings and library.
+
+Full history: [CHANGELOG.md](CHANGELOG.md).
 
 ## ✨ Core Features
 
@@ -117,6 +128,16 @@ Released under the [MIT License](LICENSE).
 ## O que é o PrintDex
 
 Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta Downloads vira um cemitério de `final_v2_CORRIGIDO (3).stl`. O **PrintDex** vigia essa pasta por você, pergunta ao Google Gemini o que é cada modelo e o arquiva numa biblioteca limpa e navegável: **categoria → franquia → tipo de item**, com um nome de arquivo organizado. E ainda calcula quanto cobrar por cada impressão.
+
+## 📝 Novidades
+
+**1.1-BETA** (hotfix) — o que mudou desde a 1.0BETA:
+
+- 🌍 **Os nomes das pastas agora seguem o idioma do app.** Na 1.0BETA, todas as pastas criadas pela IA ficavam em português, qualquer que fosse o idioma escolhido. Agora as categorias, os tipos de item e as pastas `Desconhecidos` / `Geral` são criadas em **português** com o app em PT-BR e em **inglês** nos demais idiomas (padrão, usado também para o 简体中文).
+- 🔒 A lista de categorias do seu idioma é enviada ao Gemini e travada no schema da resposta a cada requisição. Se ainda assim a IA responder no outro idioma (ex.: `Games` em vez de `Jogos`), o PrintDex traduz em vez de criar uma pasta duplicada.
+- ℹ️ Os modelos já organizados pela 1.0BETA continuam onde estão. O novo instalador atualiza a 1.0BETA por cima e mantém suas configurações e sua biblioteca.
+
+Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 
 ## ✨ Funcionalidades
 
