@@ -38,14 +38,14 @@ from google import genai
 from google.genai import errors, types
 from pydantic import BaseModel, Field, create_model
 
-from printdex.config import (
+from sliceminddex.config import (
     GEMINI_ATTEMPTS,
     GEMINI_MAX_RPM,
     GEMINI_MODEL,
     GEMINI_TIMEOUT_MS,
     SUPPORTED_EXTENSIONS,
 )
-from printdex.locales import Msg, get_language
+from sliceminddex.locales import Msg, get_language
 
 
 @dataclass(frozen=True)

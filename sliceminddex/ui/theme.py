@@ -6,7 +6,7 @@ quando o tema muda, inclusive no modo "System".
 
 import customtkinter as ctk
 
-from printdex import locales
+from sliceminddex import locales
 
 # Destaque verde, comum em softwares de impressão 3D
 ACCENT = ("#00A846", "#00AE42")

@@ -1,17 +1,17 @@
 """Persistência de configurações (pastas, API key, idioma, tema) em SQLite.
 
-O banco fica no diretório de dados do SO (ex.: %APPDATA%\\PrintDex). A tabela
+O banco fica no diretório de dados do SO (ex.: %APPDATA%\\SliceMind DEX). A tabela
 `configuracoes` tem sempre uma única linha (id = 1).
 """
 
 import shutil
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from printdex.config import DB_PATH, DEFAULT_THEME, LEGACY_DB_PATH
-from printdex.core.calculator import DEFAULT_CURRENCY
+from sliceminddex.config import DB_PATH, DEFAULT_THEME, LEGACY_DB_PATHS
+from sliceminddex.core.calculator import DEFAULT_CURRENCY
 
 # Coluna -> valor padrão. "idioma" vazio significa "ainda não escolhido": na
 # primeira execução o app usa o idioma do instalador (ou inglês) e grava.
@@ -36,25 +36,27 @@ FIELDS = tuple(_COLUMNS)
 
 class SettingsDB:
     def __init__(self, db_path: Path = DB_PATH,
-                 legacy_path: Path | None = LEGACY_DB_PATH) -> None:
+                 legacy_paths: Iterable[Path] = LEGACY_DB_PATHS) -> None:
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        # Preenchido quando o banco antigo de "data/" foi copiado para cá
+        # Preenchido quando o banco de uma versão anterior foi copiado para cá
         self.migrated_from: Path | None = None
-        self._migrate_legacy(legacy_path)
+        self._migrate_legacy(legacy_paths)
         self._create_table()
 
-    def _migrate_legacy(self, legacy_path: Path | None) -> None:
-        """Copia o banco da versão anterior, se ainda não existir um novo.
+    def _migrate_legacy(self, legacy_paths: Iterable[Path]) -> None:
+        """Copia o banco de uma versão anterior, se ainda não existir um novo.
 
-        Copia em vez de mover: o arquivo antigo fica como backup.
+        Usa o primeiro que existir (o mais recente vem antes). Copia em vez
+        de mover: o arquivo antigo fica como backup.
         """
-        if legacy_path is None or self.db_path.exists():
+        if self.db_path.exists():
             return
-        legacy_path = Path(legacy_path)
-        if legacy_path.is_file() and legacy_path.resolve() != self.db_path.resolve():
-            shutil.copy2(legacy_path, self.db_path)
-            self.migrated_from = legacy_path
+        for legacy_path in map(Path, legacy_paths):
+            if legacy_path.is_file() and legacy_path.resolve() != self.db_path.resolve():
+                shutil.copy2(legacy_path, self.db_path)
+                self.migrated_from = legacy_path
+                return
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:

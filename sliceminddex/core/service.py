@@ -16,10 +16,10 @@ from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 
-from printdex.config import GEMINI_MAX_RPM
-from printdex.core.organizer import Cancelled, OrganizeResult, organize_file
-from printdex.core.watcher import FolderMonitor
-from printdex.locales import Msg
+from sliceminddex.config import GEMINI_MAX_RPM
+from sliceminddex.core.organizer import Cancelled, OrganizeResult, organize_file
+from sliceminddex.core.watcher import FolderMonitor
+from sliceminddex.locales import Msg
 
 # Chamadas simultâneas ao Gemini (o total por minuto é limitado por
 # GEMINI_MAX_RPM, em config.py)
@@ -78,7 +78,7 @@ class MonitorService:
         if self._session is not None:
             return
         executor = ThreadPoolExecutor(
-            max_workers=ORGANIZER_WORKERS, thread_name_prefix="PrintDex-Organizer"
+            max_workers=ORGANIZER_WORKERS, thread_name_prefix="SliceMindDex-Organizer"
         )
         cancel = threading.Event()
         # Destino e chave ficam fixos nesta sessão (capturados pelo lambda)
@@ -113,7 +113,7 @@ class MonitorService:
                 self._on_log(Msg("log.queue_left", count=left))
             self._set_state("stopped")
 
-        threading.Thread(target=worker, name="PrintDex-Stop", daemon=True).start()
+        threading.Thread(target=worker, name="SliceMindDex-Stop", daemon=True).start()
 
     def shutdown(self, timeout: float = 2.0) -> None:
         """Encerra na hora (ao fechar o app). Tarefas em andamento terminam."""

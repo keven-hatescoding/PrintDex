@@ -8,10 +8,10 @@ muda rótulos e valores imediatamente (apply_currency).
 
 import customtkinter as ctk
 
-from printdex.core import calculator as calc
-from printdex.locales import t, tn
-from printdex.ui import theme
-from printdex.ui.widgets import Section, ViewHeader
+from sliceminddex.core import calculator as calc
+from sliceminddex.locales import t, tn
+from sliceminddex.ui import theme
+from sliceminddex.ui.widgets import Section, ViewHeader
 
 # (ícone, título, campos) de cada bloco
 SIMPLE_BLOCKS = (

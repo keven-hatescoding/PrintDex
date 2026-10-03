@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 
 from PIL import Image
 
-from printdex.core.thumbnail_helper import get_thumbnail
+from sliceminddex.core.thumbnail_helper import get_thumbnail
 
 WORKERS = 3
 CACHE_SIZE = 300  # miniaturas em memória (50 a 110 KB cada, conforme a escala de DPI)
@@ -84,7 +84,7 @@ class ThumbnailLoader:
             return
         for index in range(WORKERS):
             thread = threading.Thread(target=self._work, daemon=True,
-                                      name=f"PrintDex-Thumbnails-{index + 1}")
+                                      name=f"SliceMindDex-Thumbnails-{index + 1}")
             thread.start()
             self._threads.append(thread)
 

@@ -1,9 +1,22 @@
 # Changelog
 
-All notable changes to PrintDex are documented here.
+All notable changes to SliceMind DEX (formerly PrintDex) are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 🇧🇷 Versão em português abaixo de cada versão.
+
+## [Unreleased] · Rebrand
+
+### Changed
+- **PrintDex is now SliceMind DEX.** New name in the window, tray, onboarding and messages (English, Português and 简体中文). Technical names: `SliceMindDex.exe`, Python package `sliceminddex`, settings database `%APPDATA%\SliceMind DEX\sliceminddex.db`, installer `SliceMindDEX-Installer.exe`, install folder `C:\Program Files (x86)\SliceMind DEX`, repository `keven-hatescoding/SliceMind-DEX`.
+
+### Notes
+- **Upgrading from PrintDex keeps everything.** The installer keeps the same app ID, so it replaces PrintDex in "Installed apps": it closes PrintDex if it is running, installs to the new folder and removes the old program file, uninstaller and shortcuts. On first launch the settings in `%APPDATA%\PrintDex\printdex.db` are copied to the new database (the old file stays as a backup).
+- Your library does not move: if it is in `C:\Program Files (x86)\PrintDex\PRINTS`, SliceMind DEX keeps organizing there.
+
+#### 🇧🇷 Em português
+- **Alterado:** o PrintDex agora se chama **SliceMind DEX** — na janela, na bandeja, no assistente inicial e nas mensagens (inglês, português e chinês). Nomes técnicos: `SliceMindDex.exe`, pacote `sliceminddex`, banco `%APPDATA%\SliceMind DEX\sliceminddex.db`, instalador `SliceMindDEX-Installer.exe`, pasta `C:\Program Files (x86)\SliceMind DEX`.
+- **Observação:** quem atualiza do PrintDex não perde nada. O instalador usa o mesmo identificador e substitui o PrintDex (fecha o app antigo se estiver aberto, instala na pasta nova e remove o programa, o desinstalador e os atalhos antigos). Na primeira abertura, as configurações de `%APPDATA%\PrintDex\printdex.db` são copiadas para o banco novo (o antigo fica como backup). A biblioteca não muda de lugar: se estiver em `C:\Program Files (x86)\PrintDex\PRINTS`, o SliceMind DEX continua organizando ali.
 
 ## [1.2.1-BETA] — 2026-10-03 · Fix
 
@@ -21,7 +34,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.2-BETA] — 2026-10-03 · Library thumbnails
 
 ### Added
-- 🖼️ **Model thumbnails in the Library.** Files now show the same preview Windows Explorer shows (Windows Shell thumbnails, read through `ctypes` — no new dependencies). When Windows has none, PrintDex uses the image that slicers (Bambu Studio, PrusaSlicer, OrcaSlicer…) embed inside `.3mf` files; otherwise a generic 3D-file icon with the extension (STL / 3MF / OBJ).
+- 🖼️ **Model thumbnails in the Library.** Files now show the same preview Windows Explorer shows (Windows Shell thumbnails, read through `ctypes` — no new dependencies). When Windows has none, SliceMind DEX uses the image that slicers (Bambu Studio, PrusaSlicer, OrcaSlicer…) embed inside `.3mf` files; otherwise a generic 3D-file icon with the extension (STL / 3MF / OBJ).
 - File cards show the thumbnail, the name (up to two lines, long names are shortened in the middle so the end — e.g. `(2).3mf` — stays visible) and the file size.
 
 ### Changed
@@ -34,7 +47,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `.stl` and `.obj` files only get a real thumbnail if some program registered a Windows thumbnail handler for them (e.g. 3D Viewer or a slicer); otherwise they show the generic icon.
 
 #### 🇧🇷 Em português
-- **Novo:** miniaturas dos modelos na Biblioteca — a mesma pré-visualização do Explorer do Windows (via `ctypes`, sem dependências novas). Sem miniatura do Windows, o PrintDex usa a imagem que os fatiadores gravam dentro do `.3mf`; senão, um ícone genérico de arquivo 3D com a extensão. Os cards mostram a miniatura, o nome (até duas linhas, cortando o meio para manter o fim visível) e o tamanho.
+- **Novo:** miniaturas dos modelos na Biblioteca — a mesma pré-visualização do Explorer do Windows (via `ctypes`, sem dependências novas). Sem miniatura do Windows, o SliceMind DEX usa a imagem que os fatiadores gravam dentro do `.3mf`; senão, um ícone genérico de arquivo 3D com a extensão. Os cards mostram a miniatura, o nome (até duas linhas, cortando o meio para manter o fim visível) e o tamanho.
 - **Alterado:** as miniaturas carregam em segundo plano e ficam em cache; pastas grandes abrem sem congelar a janela (uma pasta com 120 arquivos travava a tela por cerca de 4 segundos). O autodiagnóstico do build também testa as miniaturas dentro do `.exe`.
 - **Observação:** o instalador 1.2-BETA instala por cima da 1.1-BETA mantendo configurações e modelos. Arquivos `.stl` e `.obj` só têm miniatura real se algum programa (ex.: Visualizador 3D ou um fatiador) registrou um gerador de miniaturas no Windows; senão mostram o ícone genérico.
 
@@ -74,7 +87,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### 🇧🇷 Em português
 Primeira versão beta pública: organizador automático com IA (Gemini) com varredura inicial, 8 categorias fixas, deduplicação byte a byte, calculadora de impressão 3D (modos Simples e Avançado), biblioteca visual, bandeja do sistema, configuração inicial, três idiomas, quatro moedas, temas e instalador para Windows.
 
-[1.2.1-BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.2.1-BETA
-[1.2-BETA]: https://github.com/keven-hatescoding/PrintDex/tree/v1.2-BETA
-[1.1-BETA]: https://github.com/keven-hatescoding/PrintDex/tree/v1.1-BETA
-[1.0BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.0BETA
+[1.2.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.2.1-BETA
+[1.2-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.2-BETA
+[1.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.1-BETA
+[1.0BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.0BETA

@@ -1,4 +1,4 @@
-"""Janela principal do PrintDex: menu lateral + Painel, Biblioteca e Configurações.
+"""Janela principal do SliceMind DEX: menu lateral + Painel, Biblioteca e Configurações.
 
 A janela é o "controlador": guarda as configurações (SQLite), o idioma, o
 tema e o histórico do log, e liga as telas ao serviço de monitoramento
@@ -25,8 +25,8 @@ from tkinter import filedialog
 
 import customtkinter as ctk
 
-from printdex import locales
-from printdex.config import (
+from sliceminddex import locales
+from sliceminddex.config import (
     APP_ICON,
     APP_NAME,
     DEFAULT_DEST_DIR,
@@ -36,21 +36,21 @@ from printdex.config import (
     THEMES,
     with_prints_folder,
 )
-from printdex.core.calculator import CURRENCIES, DEFAULT_CURRENCY
-from printdex.core.database import FIELDS, SettingsDB
-from printdex.core.service import MonitorService, Stats
-from printdex.locales import Msg, t
-from printdex.ui import theme
-from printdex.ui.calculator import CalculatorView
-from printdex.ui.dashboard import DashboardView
-from printdex.ui.icons import IconCache
-from printdex.ui.library import LibraryView
-from printdex.ui.onboarding import OnboardingDialog
-from printdex.ui.settings import SettingsView
-from printdex.ui.sidebar import Sidebar
-from printdex.ui.thumbnails import ThumbnailLoader
-from printdex.ui.tray import TrayIcon
-from printdex.ui.tray import available as tray_available
+from sliceminddex.core.calculator import CURRENCIES, DEFAULT_CURRENCY
+from sliceminddex.core.database import FIELDS, SettingsDB
+from sliceminddex.core.service import MonitorService, Stats
+from sliceminddex.locales import Msg, t
+from sliceminddex.ui import theme
+from sliceminddex.ui.calculator import CalculatorView
+from sliceminddex.ui.dashboard import DashboardView
+from sliceminddex.ui.icons import IconCache
+from sliceminddex.ui.library import LibraryView
+from sliceminddex.ui.onboarding import OnboardingDialog
+from sliceminddex.ui.settings import SettingsView
+from sliceminddex.ui.sidebar import Sidebar
+from sliceminddex.ui.thumbnails import ThumbnailLoader
+from sliceminddex.ui.tray import TrayIcon
+from sliceminddex.ui.tray import available as tray_available
 
 UI_POLL_MS = 100
 LOG_HISTORY = 1000
@@ -80,12 +80,12 @@ def _set_taskbar_identity() -> None:
     .exe não é preciso: o Windows já usa o ícone embutido nele."""
     if sys.platform == "win32" and not getattr(sys, "frozen", False):
         try:
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("PrintDex.App")
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SliceMindDex.App")
         except (AttributeError, OSError):
             pass
 
 
-class PrintDexApp(ctk.CTk):
+class SliceMindDexApp(ctk.CTk):
     def __init__(self) -> None:
         _set_taskbar_identity()  # antes de a janela existir
         super().__init__()
@@ -140,7 +140,7 @@ class PrintDexApp(ctk.CTk):
             self.withdraw()
             dialog = OnboardingDialog(self)
             self.wait_window(dialog)
-            if not dialog.completed:  # "Sair do PrintDex" no assistente
+            if not dialog.completed:  # "Sair do SliceMind DEX" no assistente
                 self.cancelled = True
                 self.destroy()
                 return
@@ -421,12 +421,12 @@ class PrintDexApp(ctk.CTk):
             self.commit_folder("pasta_destino")
 
     def _apply_default_dest(self, previous: str | None = None) -> None:
-        """Usa a pasta padrão (Program Files (x86)\\PrintDex\\PRINTS, criada
+        """Usa a pasta padrão (Program Files (x86)\\SliceMind DEX\\PRINTS, criada
         pelo instalador com permissão de escrita para os usuários).
 
         `previous` é o destino antigo quando o usuário ainda estava no padrão
         de versões anteriores; ele continua valendo se a pasta nova não estiver
-        disponível (ex.: PrintDex ainda não instalado).
+        disponível (ex.: SliceMind DEX ainda não instalado).
         """
         path = str(DEFAULT_DEST_DIR)
         try:

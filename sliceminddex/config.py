@@ -6,9 +6,12 @@ from pathlib import Path
 
 from platformdirs import user_data_dir, user_documents_dir
 
-APP_NAME = "PrintDex"
+APP_NAME = "SliceMind DEX"
+# Nome anterior do app (até a 1.2.1-BETA). Usado só para trazer os dados de
+# quem atualiza: o banco antigo e o destino padrão das primeiras versões.
+LEGACY_APP_NAME = "PrintDex"
 
-# Interface. Idiomas disponíveis em printdex/locales.py (en, pt_BR, zh_CN).
+# Interface. Idiomas disponíveis em sliceminddex/locales.py (en, pt_BR, zh_CN).
 DEFAULT_LANGUAGE = "en"
 THEMES = ("System", "Dark", "Light")  # "System" segue o modo claro/escuro do Windows
 DEFAULT_THEME = "System"
@@ -17,13 +20,20 @@ DEFAULT_THEME = "System"
 INSTALLER_APP_ID = "{8C88A66D-4411-41A6-93BF-463A05AA3E69}"
 
 # Dados internos do app (banco), no diretório padrão do SO:
-#   Windows: %APPDATA%\PrintDex   macOS: ~/Library/Application Support/PrintDex
-#   Linux:   ~/.local/share/PrintDex
+#   Windows: %APPDATA%\SliceMind DEX   macOS: ~/Library/Application Support/SliceMind DEX
+#   Linux:   ~/.local/share/SliceMind DEX
 APP_DATA_DIR = Path(user_data_dir(APP_NAME, appauthor=False, roaming=True))
-DB_PATH = APP_DATA_DIR / "printdex.db"
+DB_PATH = APP_DATA_DIR / "sliceminddex.db"
 
-# Local antigo do banco (pasta "data/" do projeto), usado só para migração
-LEGACY_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "printdex.db"
+# Bancos de versões anteriores, do mais recente ao mais antigo. Na primeira
+# execução o primeiro que existir é copiado para DB_PATH (o antigo fica como
+# backup): quem atualiza mantém pastas, API Key, idioma e calculadora.
+LEGACY_DB_PATHS = (
+    # %APPDATA%\PrintDex\printdex.db (até a 1.2.1-BETA)
+    Path(user_data_dir(LEGACY_APP_NAME, appauthor=False, roaming=True)) / "printdex.db",
+    # Pasta "data/" do projeto (primeiras versões de desenvolvimento)
+    Path(__file__).resolve().parent.parent / "data" / "printdex.db",
+)
 
 # Arquivos que acompanham o app: na raiz do projeto ou, no .exe do
 # PyInstaller, na pasta temporária onde ele se extrai (sys._MEIPASS)
@@ -33,7 +43,7 @@ APP_ICON = RESOURCE_DIR / "app_icon.ico"
 # Toda a árvore gerada pela IA fica dentro de uma pasta PRINTS.
 PRINTS_FOLDER = "PRINTS"
 
-# Padrão no Windows: C:\Program Files (x86)\PrintDex\PRINTS, como a Steam.
+# Padrão no Windows: C:\Program Files (x86)\SliceMind DEX\PRINTS, como a Steam.
 # Quem cria a pasta é o instalador (setup.iss), já com permissão de escrita
 # para o grupo Usuários: o app, os fatiadores e o Explorer gravam ali sem
 # administrador. O banco continua no AppData. A variável de ambiente cobre um
@@ -44,9 +54,11 @@ if sys.platform == "win32":
 else:
     DEFAULT_DEST_DIR = Path(user_documents_dir()) / APP_NAME / PRINTS_FOLDER
 
-# Padrão das versões anteriores (Documentos/PrintDex/PRINTS). Quem ainda usa
+# Padrão das primeiras versões (Documentos/PrintDex/PRINTS). Quem ainda usa
 # exatamente este destino é levado ao novo padrão; escolhas manuais ficam.
-PREVIOUS_DEFAULT_DEST_DIR = Path(user_documents_dir()) / APP_NAME / PRINTS_FOLDER
+# Quem usava o padrão da 1.x (Program Files (x86)\PrintDex\PRINTS) continua
+# nele: a biblioteca não muda de lugar sozinha.
+PREVIOUS_DEFAULT_DEST_DIR = Path(user_documents_dir()) / LEGACY_APP_NAME / PRINTS_FOLDER
 
 
 def with_prints_folder(path: str) -> str:

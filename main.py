@@ -1,14 +1,14 @@
-"""Ponto de entrada do PrintDex."""
+"""Ponto de entrada do SliceMind DEX."""
 
 import sys
 
-from printdex import single_instance
+from sliceminddex import single_instance
 
 
 def main() -> None:
     # Autodiagnóstico do .exe (usado pelo build.ps1); não abre janela
     if len(sys.argv) >= 3 and sys.argv[1] == "--self-test":
-        from printdex import selftest
+        from sliceminddex import selftest
         sys.exit(selftest.run(sys.argv[2]))
 
     instance = single_instance.acquire()
@@ -16,9 +16,9 @@ def main() -> None:
         return  # já estava aberto (talvez na bandeja): a janela dele foi mostrada
 
     # Importado só aqui: uma segunda instância sai sem carregar a interface
-    from printdex.ui.app import PrintDexApp
+    from sliceminddex.ui.app import SliceMindDexApp
 
-    app = PrintDexApp()
+    app = SliceMindDexApp()
     if app.cancelled:
         return  # saiu pelo assistente de primeira execução
     instance.on_activate(app.request_show)

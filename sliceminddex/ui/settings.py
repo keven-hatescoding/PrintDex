@@ -5,12 +5,12 @@ Tudo é salvo no SQLite assim que muda (sem botão "aplicar").
 
 import customtkinter as ctk
 
-from printdex import RELEASE
-from printdex.config import APP_DATA_DIR, GEMINI_MODEL, THEMES
-from printdex.core.calculator import CURRENCIES, currency_symbol
-from printdex.locales import LANGUAGES, get_language, t
-from printdex.ui import theme
-from printdex.ui.widgets import Section, ViewHeader, WrapLabel, ghost_button
+from sliceminddex import RELEASE
+from sliceminddex.config import APP_DATA_DIR, GEMINI_MODEL, THEMES
+from sliceminddex.core.calculator import CURRENCIES, currency_symbol
+from sliceminddex.locales import LANGUAGES, get_language, t
+from sliceminddex.ui import theme
+from sliceminddex.ui.widgets import Section, ViewHeader, WrapLabel, ghost_button
 
 
 class SettingsView(ctk.CTkFrame):

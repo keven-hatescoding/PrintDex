@@ -6,11 +6,11 @@ de ícones, deixando o espaço para o conteúdo.
 
 import customtkinter as ctk
 
-from printdex import RELEASE
-from printdex.config import APP_NAME
-from printdex.locales import t
-from printdex.ui import theme
-from printdex.ui.widgets import WrapLabel
+from sliceminddex import RELEASE
+from sliceminddex.config import APP_NAME
+from sliceminddex.locales import t
+from sliceminddex.ui import theme
+from sliceminddex.ui.widgets import WrapLabel
 
 # (tela, ícone, chave do texto). Os ícones são emojis desenhados pelo Tk em
 # monocromático, na cor do texto do botão.

@@ -1,7 +1,7 @@
 """Assistente de primeira execução: escolher as pastas antes de usar o app.
 
 Abre como janela modal, com a janela principal ainda escondida. Só fecha
-pelo "Concluir" (pastas válidas e salvas) ou por "Sair do PrintDex": o X da
+pelo "Concluir" (pastas válidas e salvas) ou por "Sair do SliceMind DEX": o X da
 janela não pula a configuração.
 """
 
@@ -13,10 +13,10 @@ from tkinter import filedialog
 import customtkinter as ctk
 from platformdirs import user_downloads_dir
 
-from printdex.config import APP_ICON, APP_NAME, DEFAULT_DEST_DIR, with_prints_folder
-from printdex.locales import t
-from printdex.ui import theme
-from printdex.ui.widgets import WrapLabel
+from sliceminddex.config import APP_ICON, APP_NAME, DEFAULT_DEST_DIR, with_prints_folder
+from sliceminddex.locales import t
+from sliceminddex.ui import theme
+from sliceminddex.ui.widgets import WrapLabel
 
 
 def _suggested_downloads() -> str:

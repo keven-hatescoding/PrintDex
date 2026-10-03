@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-# Receita do PyInstaller para gerar dist/PrintDex.exe (um único arquivo).
+# Receita do PyInstaller para gerar dist/SliceMindDex.exe (um único arquivo).
 # Use o build.bat (ou build.ps1), que também gera as informações de versão.
 # Os temas do CustomTkinter são incluídos pelo hook dele no PyInstaller.
 
@@ -23,7 +23,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="PrintDex",
+    name="SliceMindDex",
     console=False,  # app de janela: não abre o terminal preto junto
     icon="app_icon.ico",  # ícone do .exe (Explorer, barra de tarefas, atalhos)
     version="build/versao_windows.txt",  # criado pelo build.ps1 com a versão do app

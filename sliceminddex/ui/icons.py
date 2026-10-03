@@ -19,7 +19,7 @@ from functools import lru_cache
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFont
 
-from printdex.config import APP_ICON
+from sliceminddex.config import APP_ICON
 
 FOLDER_ICON = "📁"
 FILE_ICON = "📄"

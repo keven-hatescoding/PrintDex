@@ -1,6 +1,6 @@
 """Autodiagnóstico: confere, de dentro do .exe, se nada ficou de fora.
 
-    PrintDex.exe --self-test relatorio.txt
+    SliceMindDex.exe --self-test relatorio.txt
 
 Testa cada peça que o app usa (bibliotecas, arquivos embutidos, backends
 nativos do Windows, certificados HTTPS) e grava um relatório. Código de saída
@@ -36,7 +36,7 @@ def _checks():
 
     def app_icon():
         from PIL import Image
-        from printdex.config import APP_ICON
+        from sliceminddex.config import APP_ICON
         with Image.open(APP_ICON) as icon:
             return f"{APP_ICON.name}: {len(icon.ico.sizes())} tamanhos"
 
@@ -49,14 +49,14 @@ def _checks():
     def thumbnails():
         import tempfile
         from PIL import Image
-        from printdex.core.thumbnail_helper import get_thumbnail
-        from printdex.ui.icons import model_file_icon
+        from sliceminddex.core.thumbnail_helper import get_thumbnail
+        from sliceminddex.ui.icons import model_file_icon
         model_file_icon(".stl", dark=True)  # ícone de quando não há miniatura
         if sys.platform != "win32":
             return "fora do Windows: só o ícone genérico"
         # Um PNG sempre tem miniatura no Windows: testa ctypes + COM + GDI
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as folder:
-            path = os.path.join(folder, "printdex-self-test.png")
+            path = os.path.join(folder, "sliceminddex-self-test.png")
             Image.new("RGB", (96, 64), (0, 174, 66)).save(path)
             image = get_thumbnail(path, 48)
         if image is None:
@@ -91,7 +91,7 @@ def _checks():
         from google import genai
         from google.genai import types  # noqa: F401
         import pydantic_core  # noqa: F401
-        from printdex.core import organizer  # noqa: F401 (schema, prompt, cliente)
+        from sliceminddex.core import organizer  # noqa: F401 (schema, prompt, cliente)
         return f"google-genai {genai.__version__}"
 
     def https_certificates():
@@ -109,14 +109,14 @@ def _checks():
         return f"TLS ok com a API do Gemini (HTTP {response.status_code})"
 
     def translations():
-        from printdex import locales
+        from sliceminddex import locales
         sizes = {code: len(table) for code, table in locales.STRINGS.items()}
         if len(set(sizes.values())) != 1:
             raise RuntimeError(f"traduções incompletas: {sizes}")
         return ", ".join(f"{code}={n}" for code, n in sizes.items())
 
     def interface_modules():
-        from printdex.ui import app  # noqa: F401 (todas as telas)
+        from sliceminddex.ui import app  # noqa: F401 (todas as telas)
         return "telas e serviço carregados"
 
     return [

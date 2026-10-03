@@ -5,7 +5,7 @@ from collections.abc import Callable
 
 import customtkinter as ctk
 
-from printdex.ui import theme
+from sliceminddex.ui import theme
 
 
 class WrapLabel(ctk.CTkLabel):

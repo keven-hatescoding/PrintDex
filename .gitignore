@@ -13,8 +13,8 @@ env/
 .env.*
 
 # Banco de dados (contém a API key e caminhos pessoais). Ele fica em
-# %APPDATA%\PrintDex; "data/" é o local de versões antigas do app.
-printdex.db
+# %APPDATA%\SliceMind DEX; "data/" é o local de versões antigas do app.
+sliceminddex.db
 *.db
 *.db-journal
 *.db-wal

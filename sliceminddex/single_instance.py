@@ -1,7 +1,7 @@
-"""Uma instância só do PrintDex por usuário.
+"""Uma instância só do SliceMind DEX por usuário.
 
 Com o app escondido na bandeja, abrir o atalho de novo criaria um segundo
-PrintDex monitorando a mesma pasta (cada arquivo iria duas vezes para a IA)
+SliceMind DEX monitorando a mesma pasta (cada arquivo iria duas vezes para a IA)
 e um segundo ícone na bandeja. Em vez disso, o segundo processo acorda o
 primeiro, que mostra a janela, e sai.
 
@@ -15,7 +15,7 @@ import threading
 from collections.abc import Callable
 from functools import lru_cache
 
-_EVENT_NAME = "Local\\PrintDex.SingleInstance"  # "Local": por sessão de usuário
+_EVENT_NAME = "Local\\SliceMindDex.SingleInstance"  # "Local": por sessão de usuário
 _ERROR_ALREADY_EXISTS = 183
 _INFINITE = 0xFFFFFFFF
 _WAIT_OBJECT_0 = 0
@@ -47,7 +47,7 @@ class Instance:
 
     def on_activate(self, callback: Callable[[], None]) -> None:
         """Chama `callback` (numa thread própria) sempre que alguém tentar
-        abrir o PrintDex de novo."""
+        abrir o SliceMind DEX de novo."""
         if self._handle is None:
             return
 
@@ -55,7 +55,7 @@ class Instance:
             while _kernel32().WaitForSingleObject(self._handle, _INFINITE) == _WAIT_OBJECT_0:
                 callback()
 
-        threading.Thread(target=wait, name="PrintDex-Instance", daemon=True).start()
+        threading.Thread(target=wait, name="SliceMindDex-Instance", daemon=True).start()
 
 
 def acquire() -> Instance | None:

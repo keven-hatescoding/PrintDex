@@ -11,9 +11,9 @@ import threading
 
 from PIL import Image, ImageDraw
 
-from printdex.config import APP_NAME
-from printdex.locales import t
-from printdex.ui.icons import app_icon_image
+from sliceminddex.config import APP_NAME
+from sliceminddex.locales import t
+from sliceminddex.ui.icons import app_icon_image
 
 try:
     import pystray
@@ -48,7 +48,7 @@ class TrayIcon:
                 pystray.MenuItem(lambda _item: t("tray.exit"), self._exit),
             ),
         )
-        self._thread = threading.Thread(target=self._icon.run, name="PrintDex-Tray",
+        self._thread = threading.Thread(target=self._icon.run, name="SliceMindDex-Tray",
                                         daemon=True)
 
     def start(self) -> None:

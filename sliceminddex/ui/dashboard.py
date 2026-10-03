@@ -2,10 +2,10 @@
 
 import customtkinter as ctk
 
-from printdex.core.service import Stats
-from printdex.locales import Msg, t
-from printdex.ui import theme
-from printdex.ui.widgets import ViewHeader, WrapLabel, ghost_button
+from sliceminddex.core.service import Stats
+from sliceminddex.locales import Msg, t
+from sliceminddex.ui import theme
+from sliceminddex.ui.widgets import ViewHeader, WrapLabel, ghost_button
 
 LOG_LIMIT = 1000  # linhas mantidas na tela
 

@@ -30,8 +30,8 @@ from pathlib import Path
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
-from printdex.config import SUPPORTED_EXTENSIONS
-from printdex.locales import Msg
+from sliceminddex.config import SUPPORTED_EXTENSIONS
+from sliceminddex.locales import Msg
 
 # Sufixos que navegadores usam enquanto o download está em andamento
 TEMP_SUFFIXES = (".crdownload", ".part", ".partial", ".download",
@@ -199,7 +199,7 @@ class FolderMonitor:
         self._observer = observer
         self._checker = threading.Thread(
             target=self._check_loop, args=(handler,),
-            name="PrintDex-Checker", daemon=True,
+            name="SliceMindDex-Checker", daemon=True,
         )
         self._checker.start()
 

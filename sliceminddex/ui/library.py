@@ -17,12 +17,12 @@ from pathlib import Path
 import customtkinter as ctk
 from PIL import Image
 
-from printdex.config import SUPPORTED_EXTENSIONS
-from printdex.locales import t, tn
-from printdex.ui import theme
-from printdex.ui.icons import FILE_ICON, FOLDER_ICON, category_icon
-from printdex.ui.thumbnails import MISSING
-from printdex.ui.widgets import Card, ThumbnailCard, ViewHeader, WrapLabel, ghost_button
+from sliceminddex.config import SUPPORTED_EXTENSIONS
+from sliceminddex.locales import t, tn
+from sliceminddex.ui import theme
+from sliceminddex.ui.icons import FILE_ICON, FOLDER_ICON, category_icon
+from sliceminddex.ui.thumbnails import MISSING
+from sliceminddex.ui.widgets import Card, ThumbnailCard, ViewHeader, WrapLabel, ghost_button
 
 CARD_WIDTH = 172  # largura mínima de um card, antes da escala de DPI
 CARD_GAP = 12
