@@ -188,6 +188,14 @@ class _ClickableCard(ctk.CTkFrame):
             widget.bind("<Enter>", self._on_enter, add="+")
             widget.bind("<Leave>", self._on_leave, add="+")
             widget.bind("<Button-1>", self._on_click, add="+")
+        # Mãozinha em todo o card: os widgets do CustomTkinter desenham num
+        # canvas interno que não herda o cursor do frame (margem, bordas).
+        # O winfo_children do tkinter: o do CTkFrame esconde esse canvas.
+        pending = [self]
+        while pending:
+            widget = pending.pop()
+            tkinter.Misc.configure(widget, cursor="hand2")
+            pending.extend(tkinter.Misc.winfo_children(widget))
 
     def _set_colors(self, fg_color, border_color) -> None:
         self.configure(fg_color=fg_color, border_color=border_color)

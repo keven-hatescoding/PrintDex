@@ -5,6 +5,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 🇧🇷 Versão em português abaixo de cada versão.
 
+## [1.2.1-BETA] — 2026-10-03 · Fix
+
+### Fixed
+- **Hand cursor over the whole Library card.** On the margins of a card, the border of the thumbnail frame and the gap below it, the mouse showed the normal arrow, so it didn't look clickable there (CustomTkinter draws those areas on an inner canvas that didn't inherit the card's cursor). Fixed for both file and folder cards.
+
+### Notes
+- Clicking anywhere on a file card opens the model in the default Windows program for its type (e.g. your slicer), and the card highlights on hover — unchanged from 1.2-BETA; this release fixes the cursor feedback.
+- The 1.2.1-BETA installer installs over any previous version and keeps your settings and models.
+
+#### 🇧🇷 Em português
+- **Corrigido:** a mãozinha do mouse agora aparece em todo o card da Biblioteca. Na margem do card, na borda do quadro da miniatura e no vão abaixo dela aparecia a seta normal, e não parecia clicável (o CustomTkinter desenha essas áreas num canvas interno que não herdava o cursor do card). Vale para cards de arquivo e de pasta.
+- **Observação:** clicar em qualquer parte do card de arquivo abre o modelo no programa padrão do Windows (ex.: o fatiador), e o card destaca ao passar o mouse — como na 1.2-BETA. O instalador 1.2.1-BETA instala por cima de qualquer versão anterior mantendo configurações e modelos.
+
 ## [1.2-BETA] — 2026-10-03 · Library thumbnails
 
 ### Added
@@ -61,6 +74,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### 🇧🇷 Em português
 Primeira versão beta pública: organizador automático com IA (Gemini) com varredura inicial, 8 categorias fixas, deduplicação byte a byte, calculadora de impressão 3D (modos Simples e Avançado), biblioteca visual, bandeja do sistema, configuração inicial, três idiomas, quatro moedas, temas e instalador para Windows.
 
-[1.2-BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.2-BETA
+[1.2.1-BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.2.1-BETA
+[1.2-BETA]: https://github.com/keven-hatescoding/PrintDex/tree/v1.2-BETA
 [1.1-BETA]: https://github.com/keven-hatescoding/PrintDex/tree/v1.1-BETA
 [1.0BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.0BETA

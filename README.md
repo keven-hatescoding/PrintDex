@@ -32,19 +32,23 @@
 ---
 
 <p align="center">
-  <img src="docs/screenshots/library-thumbnails-v1.2.png" alt="PrintDex Library with model thumbnails" width="880">
+  <img src="docs/screenshots/library-thumbnails-v1.2.1.png" alt="PrintDex Library with model thumbnails" width="880">
 </p>
 
 Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your Downloads folder turns into a graveyard of `final_v2_FIXED (3).stl`. **PrintDex** watches that folder for you, asks Google Gemini what each model is, and files it into a clean, browsable library: **category → franchise → item type**, with a tidy file name. It also tells you how much to charge for each print.
 
 ## 📝 What's New
 
+**1.2.1-BETA** (fix) — changes since 1.2-BETA:
+
+- 🖱️ **Click anywhere on a card.** The hand cursor now shows over the whole Library card, including its margins and the border of the thumbnail frame, which used to show the normal arrow. Clicking a file card opens the model in your default slicer; the card highlights on hover.
+
 **1.2-BETA** — changes since 1.1-BETA:
 
 - 🖼️ **Model thumbnails in the Library.** Every file now shows the same preview Windows Explorer shows. When Windows has none, PrintDex uses the image your slicer (Bambu Studio, PrusaSlicer, OrcaSlicer…) embeds inside `.3mf` files; otherwise you get a generic 3D-file icon with the extension.
 - 🗃️ **New file cards** with the thumbnail, the name (long names are shortened in the middle, so the end — like `(2).3mf` — stays visible) and the file size.
 - ⚡ **Faster, smoother Library.** Thumbnails load in the background and are cached, and large folders no longer freeze the window (a 120-file folder used to freeze it for about 4 seconds).
-- ℹ️ The new installer upgrades 1.1-BETA in place and keeps your settings and library.
+- ℹ️ The new installer upgrades any previous version in place and keeps your settings and library.
 
 Full history: [CHANGELOG.md](CHANGELOG.md).
 
@@ -60,16 +64,16 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/library-categories-v1.2.png" alt="Library categories"></td>
-    <td><img src="docs/screenshots/dashboard-v1.2.png" alt="Dashboard"></td>
+    <td><img src="docs/screenshots/library-categories-v1.2.1.png" alt="Library categories"></td>
+    <td><img src="docs/screenshots/dashboard-v1.2.1.png" alt="Dashboard"></td>
   </tr>
   <tr>
     <td align="center"><em>Library — locked categories</em></td>
     <td align="center"><em>Dashboard — real-time activity</em></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/calculator-advanced-v1.2.png" alt="Advanced calculator"></td>
-    <td><img src="docs/screenshots/library-thumbnails-light-v1.2.png" alt="Library thumbnails in the light theme"></td>
+    <td><img src="docs/screenshots/calculator-advanced-v1.2.1.png" alt="Advanced calculator"></td>
+    <td><img src="docs/screenshots/library-thumbnails-light-v1.2.1.png" alt="Library thumbnails in the light theme"></td>
   </tr>
   <tr>
     <td align="center"><em>Calculator — Advanced mode</em></td>
@@ -82,7 +86,7 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 **Requirements:** Windows 10 or 11 (64-bit) and a free Google Gemini API key. Nothing else — Python and every library are bundled in the installer.
 
 1. Open the [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases) page.
-2. Under **Assets**, download **`PrintDex-1.2-BETA-INSTALL.exe`**.
+2. Under **Assets**, download **`PrintDex-1.2.1-BETA-INSTALL.exe`**.
 3. Run it, choose your language and follow the wizard. PrintDex is installed in `C:\Program Files (x86)\PrintDex`, and its library folder `PRINTS` is created there with write permission for your user — no need to run the app as administrator.
 
 > [!WARNING]
@@ -140,12 +144,16 @@ Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta D
 
 ## 📝 Novidades
 
+**1.2.1-BETA** (correção) — o que mudou desde a 1.2-BETA:
+
+- 🖱️ **Clique em qualquer parte do card.** A mãozinha do mouse agora aparece em todo o card da Biblioteca, inclusive na margem e na borda do quadro da miniatura, onde antes aparecia a seta normal. Clicar num card de arquivo abre o modelo no seu fatiador padrão; o card destaca ao passar o mouse.
+
 **1.2-BETA** — o que mudou desde a 1.1-BETA:
 
 - 🖼️ **Miniaturas dos modelos na Biblioteca.** Cada arquivo agora mostra a mesma pré-visualização do Explorer do Windows. Quando o Windows não tem, o PrintDex usa a imagem que o seu fatiador (Bambu Studio, PrusaSlicer, OrcaSlicer…) grava dentro do `.3mf`; senão, aparece um ícone genérico de arquivo 3D com a extensão.
 - 🗃️ **Novos cards de arquivo** com a miniatura, o nome (nomes longos são cortados no meio, para o fim — como `(2).3mf` — continuar visível) e o tamanho do arquivo.
 - ⚡ **Biblioteca mais rápida e fluida.** As miniaturas carregam em segundo plano e ficam em cache, e pastas grandes não congelam mais a janela (uma pasta com 120 arquivos travava a tela por cerca de 4 segundos).
-- ℹ️ O novo instalador atualiza a 1.1-BETA por cima e mantém suas configurações e sua biblioteca.
+- ℹ️ O novo instalador atualiza qualquer versão anterior por cima e mantém suas configurações e sua biblioteca.
 
 Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 
@@ -164,7 +172,7 @@ Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 **Requisitos:** Windows 10 ou 11 (64 bits) e uma API Key gratuita do Google Gemini. Mais nada: o Python e todas as bibliotecas já vêm dentro do instalador.
 
 1. Abra a página de [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases).
-2. Em **Assets**, baixe o **`PrintDex-1.2-BETA-INSTALL.exe`**.
+2. Em **Assets**, baixe o **`PrintDex-1.2.1-BETA-INSTALL.exe`**.
 3. Execute, escolha o idioma e siga o assistente. O PrintDex é instalado em `C:\Program Files (x86)\PrintDex`, e a pasta da biblioteca, `PRINTS`, é criada ali com permissão de escrita para o seu usuário — não é preciso abrir o app como administrador.
 
 > [!WARNING]
