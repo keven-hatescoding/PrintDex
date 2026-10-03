@@ -39,9 +39,10 @@ Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your D
 
 ## 📝 What's New
 
-**New name: SliceMind DEX** — the app formerly known as *PrintDex*:
+**1.3-BETA** — *PrintDex* is now **SliceMind DEX**:
 
 - 🏷️ Same app, new name everywhere: window, tray, installer (`SliceMindDEX-Installer.exe`) and install folder (`C:\Program Files (x86)\SliceMind DEX`).
+- 🎨 **New visual identity** — a new app icon in the window, taskbar, tray, shortcuts and installer.
 - 🔁 **Nothing to redo when upgrading.** The installer replaces PrintDex in place, and on first launch your settings (folders, API key, language, calculator values) are copied over automatically. Your models stay exactly where they are.
 
 **1.2.1-BETA** (fix) — changes since 1.2-BETA:
@@ -149,9 +150,10 @@ Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta D
 
 ## 📝 Novidades
 
-**Novo nome: SliceMind DEX** — o app que se chamava *PrintDex*:
+**1.3-BETA** — o *PrintDex* agora se chama **SliceMind DEX**:
 
 - 🏷️ O mesmo app, com o nome novo em todo lugar: janela, bandeja, instalador (`SliceMindDEX-Installer.exe`) e pasta de instalação (`C:\Program Files (x86)\SliceMind DEX`).
+- 🎨 **Nova identidade visual** — ícone novo na janela, barra de tarefas, bandeja, atalhos e instalador.
 - 🔁 **Nada a refazer ao atualizar.** O instalador substitui o PrintDex, e na primeira abertura as suas configurações (pastas, API Key, idioma, valores da calculadora) são copiadas automaticamente. Os seus modelos continuam exatamente onde estão.
 
 **1.2.1-BETA** (correção) — o que mudou desde a 1.2-BETA:

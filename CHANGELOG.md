@@ -5,9 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 🇧🇷 Versão em português abaixo de cada versão.
 
-## [Unreleased] · Rebrand
+## [1.3-BETA] — 2026-10-03 · SliceMind DEX
 
 ### Changed
+- **New visual identity:** new app icon for the window, taskbar, tray, shortcuts and installer.
 - **PrintDex is now SliceMind DEX.** New name in the window, tray, onboarding and messages (English, Português and 简体中文). Technical names: `SliceMindDex.exe`, Python package `sliceminddex`, settings database `%APPDATA%\SliceMind DEX\sliceminddex.db`, installer `SliceMindDEX-Installer.exe`, install folder `C:\Program Files (x86)\SliceMind DEX`, repository `keven-hatescoding/SliceMind-DEX`.
 
 ### Notes
@@ -15,6 +16,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Your library does not move: if it is in `C:\Program Files (x86)\PrintDex\PRINTS`, SliceMind DEX keeps organizing there.
 
 #### 🇧🇷 Em português
+- **Nova identidade visual:** ícone novo na janela, barra de tarefas, bandeja, atalhos e instalador.
 - **Alterado:** o PrintDex agora se chama **SliceMind DEX** — na janela, na bandeja, no assistente inicial e nas mensagens (inglês, português e chinês). Nomes técnicos: `SliceMindDex.exe`, pacote `sliceminddex`, banco `%APPDATA%\SliceMind DEX\sliceminddex.db`, instalador `SliceMindDEX-Installer.exe`, pasta `C:\Program Files (x86)\SliceMind DEX`.
 - **Observação:** quem atualiza do PrintDex não perde nada. O instalador usa o mesmo identificador e substitui o PrintDex (fecha o app antigo se estiver aberto, instala na pasta nova e remove o programa, o desinstalador e os atalhos antigos). Na primeira abertura, as configurações de `%APPDATA%\PrintDex\printdex.db` são copiadas para o banco novo (o antigo fica como backup). A biblioteca não muda de lugar: se estiver em `C:\Program Files (x86)\PrintDex\PRINTS`, o SliceMind DEX continua organizando ali.
 
@@ -87,7 +89,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### 🇧🇷 Em português
 Primeira versão beta pública: organizador automático com IA (Gemini) com varredura inicial, 8 categorias fixas, deduplicação byte a byte, calculadora de impressão 3D (modos Simples e Avançado), biblioteca visual, bandeja do sistema, configuração inicial, três idiomas, quatro moedas, temas e instalador para Windows.
 
-[1.2.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.2.1-BETA
+[1.3-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.3-BETA
+[1.2.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.2.1-BETA
 [1.2-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.2-BETA
 [1.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.1-BETA
 [1.0BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.0BETA
