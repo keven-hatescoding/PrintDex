@@ -7,7 +7,8 @@ colorido numa imagem com o Pillow, usando a fonte de emojis do Windows
 como texto.
 
 Regra visual da Biblioteca: só as categorias (nível 1) têm ícone temático.
-Franquias e tipos de item usam a pasta genérica, e arquivos, a folha.
+Franquias e tipos de item usam a pasta genérica. Arquivos mostram a
+miniatura; sem ela, o cubo de arquivo 3D (model_file_icon) ou a folha.
 """
 
 import os
@@ -107,6 +108,38 @@ def _emoji_pil(emoji: str) -> Image.Image | None:
     return square
 
 
+@lru_cache(maxsize=16)
+def model_file_icon(extension: str, dark: bool) -> Image.Image:
+    """Ícone genérico de arquivo 3D (sem miniatura): cubo verde com a extensão.
+
+    Desenhado em 512 px e reduzido para 256 px, o que suaviza as bordas.
+    """
+    canvas = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+    cx, cy, s = 256, 214, 150
+    dx = s * 0.866  # cos 30°: projeção isométrica
+    top, center, bottom = (cx, cy - s), (cx, cy), (cx, cy + s)
+    left_top, right_top = (cx - dx, cy - s / 2), (cx + dx, cy - s / 2)
+    left_bottom, right_bottom = (cx - dx, cy + s / 2), (cx + dx, cy + s / 2)
+    draw.polygon([top, right_top, center, left_top], fill="#4ADE80")
+    draw.polygon([left_top, center, bottom, left_bottom], fill="#00AE42")
+    draw.polygon([center, right_top, right_bottom, bottom], fill="#00843A")
+    for end in (left_top, right_top, bottom):  # arestas da frente, em destaque
+        draw.line([center, end], fill=(255, 255, 255, 110), width=6)
+
+    label = extension.lstrip(".").upper()
+    try:
+        font = ImageFont.truetype("segoeuib.ttf", 64)
+    except OSError:
+        font = ImageFont.load_default(size=64)
+    left, _, right, _ = draw.textbbox((0, 0), label, font=font)
+    width = right - left + 64
+    pill = (cx - width / 2, 404, cx + width / 2, 484)
+    draw.rounded_rectangle(pill, radius=40, fill="#E8EAED" if dark else "#15171A")
+    draw.text((cx, 444), label, font=font, anchor="mm", fill="#15171A" if dark else "#FFFFFF")
+    return canvas.resize((256, 256), Image.Resampling.LANCZOS)
+
+
 @lru_cache(maxsize=1)
 def app_icon_image() -> Image.Image | None:
     """O maior quadro do app_icon.ico (256 px), ou None se o arquivo faltar."""
@@ -132,6 +165,15 @@ class IconCache:
 
     def app_icon(self, size: int) -> ctk.CTkImage | None:
         return self._cached("<app_icon>", size, app_icon_image)
+
+    def model_file(self, extension: str, size: int) -> ctk.CTkImage:
+        """Ícone genérico de arquivo 3D, nas versões clara e escura."""
+        key = (f"<model>{extension}", size)
+        if key not in self._images:
+            self._images[key] = ctk.CTkImage(model_file_icon(extension, dark=False),
+                                             model_file_icon(extension, dark=True),
+                                             size=(size, size))
+        return self._images[key]
 
     def _cached(self, name: str, size: int, load) -> ctk.CTkImage | None:
         key = (name, size)

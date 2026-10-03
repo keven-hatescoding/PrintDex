@@ -46,6 +46,26 @@ def _checks():
             raise FileNotFoundError("Segoe UI Emoji ausente (ícones viram texto)")
         return "Segoe UI Emoji presente"
 
+    def thumbnails():
+        import tempfile
+        from PIL import Image
+        from printdex.core.thumbnail_helper import get_thumbnail
+        from printdex.ui.icons import model_file_icon
+        model_file_icon(".stl", dark=True)  # ícone de quando não há miniatura
+        if sys.platform != "win32":
+            return "fora do Windows: só o ícone genérico"
+        # Um PNG sempre tem miniatura no Windows: testa ctypes + COM + GDI
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as folder:
+            path = os.path.join(folder, "printdex-self-test.png")
+            Image.new("RGB", (96, 64), (0, 174, 66)).save(path)
+            image = get_thumbnail(path, 48)
+        if image is None:
+            raise RuntimeError("o Windows não devolveu a miniatura de um PNG")
+        color = image.getpixel((image.width // 2, image.height // 2))
+        if any(abs(a - b) > 4 for a, b in zip(color, (0, 174, 66, 255))):
+            raise RuntimeError(f"cores trocadas na conversão da miniatura: {color}")
+        return f"Windows Shell ok ({image.width}x{image.height})"
+
     def folder_watcher():
         from watchdog.observers import Observer
         name = Observer.__name__
@@ -105,6 +125,7 @@ def _checks():
         ("Imagens (Pillow)", images),
         ("Ícone do app", app_icon),
         ("Fonte de emojis", emoji_font),
+        ("Miniaturas (Windows Shell)", thumbnails),
         ("Monitor de pastas (Watchdog)", folder_watcher),
         ("Bandeja (pystray)", tray),
         ("Banco de dados (SQLite)", database),

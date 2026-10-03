@@ -3,22 +3,41 @@
 PRINTS / categoria / franquia / tipo de item / arquivos. Clicar numa pasta
 entra nela; clicar num arquivo abre no programa padrão (ex.: o fatiador).
 A grade ajusta o número de colunas à largura da janela.
+
+Os arquivos aparecem com a miniatura que o Windows gera (a mesma do
+Explorer), carregada em segundo plano por app.thumbnails.
 """
 
+import math
 import os
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
 import customtkinter as ctk
+from PIL import Image
 
+from printdex.config import SUPPORTED_EXTENSIONS
 from printdex.locales import t, tn
 from printdex.ui import theme
 from printdex.ui.icons import FILE_ICON, FOLDER_ICON, category_icon
-from printdex.ui.widgets import Card, ViewHeader, WrapLabel, ghost_button
+from printdex.ui.thumbnails import MISSING
+from printdex.ui.widgets import Card, ThumbnailCard, ViewHeader, WrapLabel, ghost_button
 
 CARD_WIDTH = 172  # largura mínima de um card, antes da escala de DPI
 CARD_GAP = 12
-BATCH = 24        # cards criados por vez (pastas grandes não travam a tela)
+# Pastas grandes: os cards são criados em lotes. Cada lote cria cards por no
+# máximo estes segundos (~3 ms por card); desenhá-los leva ~4x isso. Entre os
+# lotes a tela responde a cliques e à rolagem.
+FIRST_BATCH_SECONDS = 0.04
+BATCH_SECONDS = 0.015
+BATCH_PAUSE_MS = 15
+TRASH_BATCH = 10  # cards destruídos por vez depois de sair de uma pasta
+TRASH_PAUSE_MS = 20
+# Miniatura: cabe nesta área (o quadro do card mais estreito tem 132 px úteis)
+THUMB_BOX = (128, 104)
+THUMB_TILE_HEIGHT = 116
+FALLBACK_ICON_SIZE = 84  # sem miniatura: ícone genérico, menor que uma miniatura
 _HIDDEN_NAMES = {"desktop.ini", "thumbs.db"}
 _HIDDEN_ATTRIBUTES = 0x2 | 0x4  # FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM
 
@@ -29,6 +48,7 @@ class _Entry:
     path: str
     is_dir: bool
     detail: str
+    stamp: tuple[int, int] = (0, 0)  # arquivos: (mtime_ns, tamanho), chave da miniatura
 
 
 def _visible(entry: os.DirEntry) -> bool:
@@ -50,6 +70,12 @@ def _size_text(size: int) -> str:
     return ""
 
 
+def _fit(size: tuple[int, int], box: tuple[int, int]) -> tuple[int, int]:
+    """Tamanho que cabe em `box` mantendo a proporção."""
+    scale = min(box[0] / size[0], box[1] / size[1])
+    return max(1, round(size[0] * scale)), max(1, round(size[1] * scale))
+
+
 def _list_folder(folder: Path) -> list[_Entry]:
     """Subpastas (com a contagem de itens) e depois arquivos, em ordem alfabética."""
     folders, files = [], []
@@ -67,10 +93,11 @@ def _list_folder(folder: Path) -> list[_Entry]:
                 folders.append(_Entry(entry.name, entry.path, True, detail))
             else:
                 try:
-                    detail = _size_text(entry.stat().st_size)
+                    info = entry.stat()
+                    detail, stamp = _size_text(info.st_size), (info.st_mtime_ns, info.st_size)
                 except OSError:
-                    detail = ""
-                files.append(_Entry(entry.name, entry.path, False, detail))
+                    detail, stamp = "", (0, 0)
+                files.append(_Entry(entry.name, entry.path, False, detail, stamp))
 
     def key(item: _Entry) -> str:
         return item.name.casefold()
@@ -83,7 +110,8 @@ class LibraryView(ctk.CTkFrame):
         super().__init__(master, fg_color="transparent")
         self.app = app
         self.parts: list[str] = []  # pasta atual, relativa à PRINTS
-        self._cards: list[Card] = []
+        self._cards: list[Card | ThumbnailCard] = []
+        self._trash: list[Card | ThumbnailCard] = []  # cards fora da tela, a destruir
         self._columns = 0
         self._generation = 0  # invalida lotes de uma navegação anterior
         self._jobs: dict[str, str] = {}  # after() pendentes, por nome
@@ -185,10 +213,9 @@ class LibraryView(ctk.CTkFrame):
 
     def _render(self, entries: list) -> None:
         self._generation += 1
+        self.app.thumbnails.new_generation()
         self._cancel("batch")
-        for card in self._cards:
-            card.destroy()
-        self._cards = []
+        self._discard_cards()
         self._render_crumbs()
         self.back_button.configure(state="normal" if self.parts else "disabled")
         self.open_button.configure(state="normal")
@@ -204,25 +231,60 @@ class LibraryView(ctk.CTkFrame):
         if generation != self._generation:
             return  # o usuário já navegou para outra pasta
         depth = len(self.parts)
-        for entry in entries[start:start + BATCH]:
+        # Lotes por tempo, não por quantidade: rápidos em qualquer computador.
+        # O 1º é maior, para a pasta aberta já aparecer cheia.
+        budget = FIRST_BATCH_SECONDS if start == 0 else BATCH_SECONDS
+        deadline = time.perf_counter() + budget
+        end = start
+        while end < len(entries) and (end == start or time.perf_counter() < deadline):
+            entry = entries[end]
+            end += 1
             if entry.is_dir:
                 # Só as categorias (nível 1) têm ícone temático
                 emoji = category_icon(entry.name) if depth == 0 else FOLDER_ICON
                 command = lambda name=entry.name: self.navigate(self.parts + [name])
+                self._cards.append(Card(self.grid_frame, self.app.icons.get(emoji, 52),
+                                        emoji, entry.name, entry.detail, command))
             else:
-                emoji = FILE_ICON
                 command = lambda path=entry.path: self.app.open_path(path)
-            self._cards.append(Card(self.grid_frame, self.app.icons.get(emoji, 52),
-                                    emoji, entry.name, entry.detail, command))
-        self._relayout(force=True)
-        if start + BATCH < len(entries):
-            self._jobs["batch"] = self.after(1, self._create_batch, entries,
-                                             start + BATCH, generation)
+                card = ThumbnailCard(self.grid_frame, entry.name, entry.detail, command,
+                                     THUMB_TILE_HEIGHT)
+                self._cards.append(card)
+                self._load_thumbnail(card, entry)
+        self._relayout(first=start)
+        # Desenha este lote já: senão o trabalho de todos os lotes se acumula e
+        # sai de uma vez só (a barra de rolagem do CustomTkinter chama
+        # update_idletasks), congelando a tela por segundos em pastas grandes
+        self.grid_frame.update_idletasks()
+        if end < len(entries):
+            # A pausa deixa passar cliques e a rolagem entre um lote e outro
+            self._jobs["batch"] = self.after(BATCH_PAUSE_MS, self._create_batch, entries,
+                                             end, generation)
         elif self._restore_scroll is not None:
             position, self._restore_scroll = self._restore_scroll, None
             self.after_idle(lambda: self.grid_frame._parent_canvas.yview_moveto(position))
 
-    def _relayout(self, force: bool = False) -> None:
+    def _discard_cards(self) -> None:
+        """Tira os cards da tela já e os destrói aos poucos: destruir uma
+        pasta grande de uma vez (~4 ms por card) trava a tela."""
+        for card in self._cards:
+            card.grid_forget()
+        self._trash.extend(self._cards)
+        self._cards = []
+        if self._trash and "trash" not in self._jobs:
+            self._jobs["trash"] = self.after(TRASH_PAUSE_MS, self._empty_trash)
+
+    def _empty_trash(self) -> None:
+        del self._jobs["trash"]
+        for card in self._trash[:TRASH_BATCH]:
+            card.destroy()
+        del self._trash[:TRASH_BATCH]
+        if self._trash:
+            self._jobs["trash"] = self.after(TRASH_PAUSE_MS, self._empty_trash)
+
+    def _relayout(self, first: int | None = None) -> None:
+        """Ajusta as colunas à largura; `first` posiciona os cards a partir
+        dele (os novos de um lote). Mudou o número de colunas: todos."""
         width = self.grid_frame.winfo_width() / self.grid_frame._get_widget_scaling()
         columns = max(1, int((width + CARD_GAP) // (CARD_WIDTH + CARD_GAP)))
         if columns != self._columns:
@@ -231,11 +293,41 @@ class LibraryView(ctk.CTkFrame):
                 self.grid_frame.grid_columnconfigure(index, weight=1 if used else 0,
                                                      uniform="card" if used else "")
             self._columns = columns
-            force = True
-        if force:
-            for index, card in enumerate(self._cards):
-                card.grid(row=index // columns, column=index % columns,
-                          padx=CARD_GAP // 2, pady=CARD_GAP // 2, sticky="nsew")
+            first = 0
+        if first is not None:
+            for index in range(first, len(self._cards)):
+                self._cards[index].grid(row=index // columns, column=index % columns,
+                                        padx=CARD_GAP // 2, pady=CARD_GAP // 2, sticky="nsew")
+
+    # ------------------------------------------------------------ miniaturas
+
+    def _load_thumbnail(self, card: ThumbnailCard, entry: _Entry) -> None:
+        """Do cache na hora; senão, em segundo plano (o card espera vazio)."""
+        # Em pixels reais: nítida com qualquer escala de DPI
+        pixels = math.ceil(max(THUMB_BOX) * self._get_widget_scaling())
+        key = (os.path.normcase(entry.path), entry.stamp, pixels)
+        image = self.app.thumbnails.lookup(key)
+        generation = self._generation
+        if image is MISSING:
+            self.app.thumbnails.request(
+                key, entry.path, pixels,
+                lambda image: self._show_thumbnail(card, entry.name, image, generation))
+        else:
+            self._show_thumbnail(card, entry.name, image, generation)
+
+    def _show_thumbnail(self, card: ThumbnailCard, name: str,
+                        image: Image.Image | None, generation: int) -> None:
+        if generation != self._generation:
+            return  # chegou depois que o usuário saiu da pasta
+        if image is not None:
+            card.set_image(ctk.CTkImage(image, image, size=_fit(image.size, THUMB_BOX)))
+            return
+        # Sem miniatura: cubo de arquivo 3D (ou a folha, para outros arquivos)
+        extension = os.path.splitext(name)[1].lower()
+        if extension in SUPPORTED_EXTENSIONS:
+            card.set_image(self.app.icons.model_file(extension, FALLBACK_ICON_SIZE))
+        elif icon := self.app.icons.get(FILE_ICON, FALLBACK_ICON_SIZE - 16):
+            card.set_image(icon)
 
     def _render_crumbs(self) -> None:
         for widget in self.crumbs.winfo_children():
@@ -264,10 +356,9 @@ class LibraryView(ctk.CTkFrame):
 
     def _show_message(self, text: str, with_button: bool = False) -> None:
         self._generation += 1
+        self.app.thumbnails.new_generation()
         self._cancel("batch")
-        for card in self._cards:
-            card.destroy()
-        self._cards = []
+        self._discard_cards()
         self._render_crumbs()
         self.back_button.configure(state="normal" if self.parts else "disabled")
         self.open_button.configure(state="normal" if self.current() and self.current().is_dir()
@@ -314,4 +405,7 @@ class LibraryView(ctk.CTkFrame):
         for job in list(self._jobs.values()):
             self.after_cancel(job)
         self._jobs.clear()
+        # Telas recriadas (troca de idioma): miniaturas a caminho são ignoradas
+        self._generation += 1
+        self.app.thumbnails.new_generation()
         super().destroy()

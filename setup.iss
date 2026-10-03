@@ -1,5 +1,5 @@
 ﻿; Receita do Inno Setup para o instalador do PrintDex.
-; Gerado pelo build.ps1, que passa /DVersao=1.0.0 (numérica) e /DRelease=1.0BETA
+; Gerado pelo build.ps1, que passa /DVersao=1.2.0 (numérica) e /DRelease=1.2-BETA
 ; (nome do lançamento). Também pode ser compilado à mão no Inno Setup depois
 ; de gerar o dist\PrintDex.exe: nesse caso as duas são lidas do próprio .exe.
 

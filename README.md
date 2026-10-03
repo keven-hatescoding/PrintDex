@@ -32,18 +32,19 @@
 ---
 
 <p align="center">
-  <img src="docs/screenshots/library-en.png" alt="PrintDex Library" width="880">
+  <img src="docs/screenshots/library-thumbnails-v1.2.png" alt="PrintDex Library with model thumbnails" width="880">
 </p>
 
 Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your Downloads folder turns into a graveyard of `final_v2_FIXED (3).stl`. **PrintDex** watches that folder for you, asks Google Gemini what each model is, and files it into a clean, browsable library: **category → franchise → item type**, with a tidy file name. It also tells you how much to charge for each print.
 
 ## 📝 What's New
 
-**1.1-BETA** (hotfix) — changes since 1.0BETA:
+**1.2-BETA** — changes since 1.1-BETA:
 
-- 🌍 **Folder names now follow the app language.** In 1.0BETA, every folder created by the AI was in Portuguese, whatever language you used. Now categories, item types and the `Unknown` / `General` folders are created in **English** by default (also when the app is in 简体中文) and in **Portuguese** when the app is set to PT-BR.
-- 🔒 The category list of your language is sent to Gemini and locked in the response schema on every request. If the AI still answers in the other language (e.g. `Jogos` instead of `Games`), PrintDex translates it instead of creating a duplicate folder.
-- ℹ️ Models already organized by 1.0BETA stay where they are. The new installer upgrades 1.0BETA in place and keeps your settings and library.
+- 🖼️ **Model thumbnails in the Library.** Every file now shows the same preview Windows Explorer shows. When Windows has none, PrintDex uses the image your slicer (Bambu Studio, PrusaSlicer, OrcaSlicer…) embeds inside `.3mf` files; otherwise you get a generic 3D-file icon with the extension.
+- 🗃️ **New file cards** with the thumbnail, the name (long names are shortened in the middle, so the end — like `(2).3mf` — stays visible) and the file size.
+- ⚡ **Faster, smoother Library.** Thumbnails load in the background and are cached, and large folders no longer freeze the window (a 120-file folder used to freeze it for about 4 seconds).
+- ℹ️ The new installer upgrades 1.1-BETA in place and keeps your settings and library.
 
 Full history: [CHANGELOG.md](CHANGELOG.md).
 
@@ -53,18 +54,26 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 - 🗂️ **Locked, consistent categories** — The AI can only use 8 fixed top-level folders, so the same character never ends up in three different places: `Anime & Manga`, `Movies & TV Shows`, `Games`, `Utilities & Tools`, `Decoration`, `Automotive`, `Cosplay & Accessories` and `Others`. Folder names follow the app language — English by default (also used for Chinese) and Portuguese when the app is set to PT-BR.
 - 🧬 **Smart Deduplication** — Before saving, PrintDex compares the new file byte-for-byte with what is already in the library. Identical downloads are discarded instead of piling up as `file (1)`, `file (2)`… saving disk space.
 - 🧮 **Advanced 3D Print Calculator** — A *Simple* mode for a quick quote (filament + energy + margin) and an *Advanced* dashboard with machine depreciation, manual labor, failure risk, quantity and a visual cost breakdown. Results update as you type.
-- 📚 **Visual Library** — Browse your collection as cards with themed icons, jump straight to any folder in Explorer with the **Local Files** button, and open a model in your slicer with one click.
+- 📚 **Visual Library** — Browse your collection as cards: themed icons for categories and a **thumbnail of every model** (the same preview Windows Explorer shows, or the one your slicer embedded in the `.3mf`). Jump straight to any folder in Explorer with the **Local Files** button, and open a model in your slicer with one click.
 - 🔔 **System Tray Integration** — Closing the window keeps PrintDex running silently in the notification area, still organizing your downloads. A green badge shows when monitoring is on.
 - 🌍 **Global Support** — Interface in **English, Português (Brasil) and 简体中文**, and currency formatting for **BRL, USD, EUR and CNY**. Light, dark or automatic (system) theme.
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/dashboard-en.png" alt="Dashboard"></td>
-    <td><img src="docs/screenshots/calculator-advanced-en.png" alt="Advanced calculator"></td>
+    <td><img src="docs/screenshots/library-categories-v1.2.png" alt="Library categories"></td>
+    <td><img src="docs/screenshots/dashboard-v1.2.png" alt="Dashboard"></td>
   </tr>
   <tr>
+    <td align="center"><em>Library — locked categories</em></td>
     <td align="center"><em>Dashboard — real-time activity</em></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/calculator-advanced-v1.2.png" alt="Advanced calculator"></td>
+    <td><img src="docs/screenshots/library-thumbnails-light-v1.2.png" alt="Library thumbnails in the light theme"></td>
+  </tr>
+  <tr>
     <td align="center"><em>Calculator — Advanced mode</em></td>
+    <td align="center"><em>Thumbnails — light theme</em></td>
   </tr>
 </table>
 
@@ -73,7 +82,7 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 **Requirements:** Windows 10 or 11 (64-bit) and a free Google Gemini API key. Nothing else — Python and every library are bundled in the installer.
 
 1. Open the [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases) page.
-2. Under **Assets**, download **`PrintDex-1.1-BETA-INSTALL.exe`**.
+2. Under **Assets**, download **`PrintDex-1.2-BETA-INSTALL.exe`**.
 3. Run it, choose your language and follow the wizard. PrintDex is installed in `C:\Program Files (x86)\PrintDex`, and its library folder `PRINTS` is created there with write permission for your user — no need to run the app as administrator.
 
 > [!WARNING]
@@ -131,11 +140,12 @@ Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta D
 
 ## 📝 Novidades
 
-**1.1-BETA** (hotfix) — o que mudou desde a 1.0BETA:
+**1.2-BETA** — o que mudou desde a 1.1-BETA:
 
-- 🌍 **Os nomes das pastas agora seguem o idioma do app.** Na 1.0BETA, todas as pastas criadas pela IA ficavam em português, qualquer que fosse o idioma escolhido. Agora as categorias, os tipos de item e as pastas `Desconhecidos` / `Geral` são criadas em **português** com o app em PT-BR e em **inglês** nos demais idiomas (padrão, usado também para o 简体中文).
-- 🔒 A lista de categorias do seu idioma é enviada ao Gemini e travada no schema da resposta a cada requisição. Se ainda assim a IA responder no outro idioma (ex.: `Games` em vez de `Jogos`), o PrintDex traduz em vez de criar uma pasta duplicada.
-- ℹ️ Os modelos já organizados pela 1.0BETA continuam onde estão. O novo instalador atualiza a 1.0BETA por cima e mantém suas configurações e sua biblioteca.
+- 🖼️ **Miniaturas dos modelos na Biblioteca.** Cada arquivo agora mostra a mesma pré-visualização do Explorer do Windows. Quando o Windows não tem, o PrintDex usa a imagem que o seu fatiador (Bambu Studio, PrusaSlicer, OrcaSlicer…) grava dentro do `.3mf`; senão, aparece um ícone genérico de arquivo 3D com a extensão.
+- 🗃️ **Novos cards de arquivo** com a miniatura, o nome (nomes longos são cortados no meio, para o fim — como `(2).3mf` — continuar visível) e o tamanho do arquivo.
+- ⚡ **Biblioteca mais rápida e fluida.** As miniaturas carregam em segundo plano e ficam em cache, e pastas grandes não congelam mais a janela (uma pasta com 120 arquivos travava a tela por cerca de 4 segundos).
+- ℹ️ O novo instalador atualiza a 1.1-BETA por cima e mantém suas configurações e sua biblioteca.
 
 Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 
@@ -145,7 +155,7 @@ Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 - 🗂️ **Categorias fixas e consistentes** — A IA só pode usar 8 pastas principais, então o mesmo personagem nunca vai parar em três lugares diferentes. Com o app em português: `Animes e Mangas`, `Filmes e Series`, `Jogos`, `Utilitarios e Ferramentas`, `Decoracao`, `Automotivo`, `Cosplay e Acessorios` e `Outros`. Em inglês (padrão, usado também para o chinês), as pastas ficam em inglês (`Anime & Manga`, `Games`…).
 - 🧬 **Deduplicação inteligente** — Antes de salvar, o PrintDex compara o novo arquivo byte a byte com o que já está na biblioteca. Downloads idênticos são descartados em vez de se acumularem como `arquivo (1)`, `arquivo (2)`…, economizando espaço em disco.
 - 🧮 **Calculadora de Impressão 3D** — Um *Modo Simples* para orçamentos rápidos (filamento + energia + margem) e um *Modo Avançado* com depreciação da máquina, trabalho manual, risco de falha, quantidade e a anatomia visual do custo. Os resultados mudam enquanto você digita.
-- 📚 **Biblioteca visual** — Navegue pela coleção em cards com ícones temáticos, abra qualquer pasta no Explorer pelo botão **Arquivos Locais** e abra um modelo no seu fatiador com um clique.
+- 📚 **Biblioteca visual** — Navegue pela coleção em cards: ícones temáticos nas categorias e a **miniatura de cada modelo** (a mesma pré-visualização do Explorer do Windows, ou a que o fatiador gravou no `.3mf`). Abra qualquer pasta no Explorer pelo botão **Arquivos Locais** e abra um modelo no seu fatiador com um clique.
 - 🔔 **Integração com a bandeja do Windows** — Fechar a janela mantém o PrintDex rodando discretamente na área de notificação, organizando seus downloads. Um selo verde no ícone indica que o monitoramento está ativo.
 - 🌍 **Suporte global** — Interface em **English, Português (Brasil) e 简体中文**, e formatação de valores em **BRL, USD, EUR e CNY**. Tema claro, escuro ou automático (segue o Windows).
 
@@ -154,7 +164,7 @@ Histórico completo: [CHANGELOG.md](CHANGELOG.md).
 **Requisitos:** Windows 10 ou 11 (64 bits) e uma API Key gratuita do Google Gemini. Mais nada: o Python e todas as bibliotecas já vêm dentro do instalador.
 
 1. Abra a página de [**Releases**](https://github.com/keven-hatescoding/PrintDex/releases).
-2. Em **Assets**, baixe o **`PrintDex-1.1-BETA-INSTALL.exe`**.
+2. Em **Assets**, baixe o **`PrintDex-1.2-BETA-INSTALL.exe`**.
 3. Execute, escolha o idioma e siga o assistente. O PrintDex é instalado em `C:\Program Files (x86)\PrintDex`, e a pasta da biblioteca, `PRINTS`, é criada ali com permissão de escrita para o seu usuário — não é preciso abrir o app como administrador.
 
 > [!WARNING]

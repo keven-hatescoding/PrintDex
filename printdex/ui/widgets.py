@@ -82,35 +82,132 @@ class Section(ctk.CTkFrame):
         self._row += 1
 
 
-class Card(ctk.CTkFrame):
-    """Card clicável da Biblioteca: ícone, nome e detalhe."""
+def _longest(limit: int, fits: Callable[[int], bool]) -> int:
+    """Maior n em [0, limit] com fits(n) verdadeiro (busca binária: fits vale
+    para todo n até a resposta e falha depois dela)."""
+    low, high = 0, limit
+    while low < high:
+        middle = (low + high + 1) // 2
+        if fits(middle):
+            low = middle
+        else:
+            high = middle - 1
+    return low
 
-    def __init__(self, master, image: ctk.CTkImage | None, icon_text: str,
-                 title: str, detail: str, command: Callable[[], None]) -> None:
+
+def elide(text: str, measure: Callable[[str], int], width: int,
+          max_lines: int = 2, keep_end: int = 8) -> str:
+    """Quebra o texto em até max_lines linhas de no máximo `width` px.
+
+    Quebra de preferência depois de espaço, "_" ou "-". Se não couber,
+    a última linha perde o meio e mantém os últimos `keep_end` caracteres.
+    """
+    lines: list[str] = []
+    rest = text
+    while rest:
+        if measure(rest) <= width:
+            lines.append(rest)
+            break
+        if len(lines) == max_lines - 1:
+            tail = rest[-keep_end:] if measure("…" + rest[-keep_end:]) <= width else ""
+            head = rest[:len(rest) - len(tail)]
+            size = _longest(len(head), lambda n: measure(head[:n].rstrip() + "…" + tail) <= width)
+            lines.append(head[:size].rstrip() + "…" + tail)
+            break
+        cut = max(1, _longest(len(rest), lambda n: measure(rest[:n]) <= width))
+        breaks = [rest.rfind(separator, 0, cut) for separator in " _-"]
+        if max(breaks) >= cut // 2:  # só se não desperdiçar meia linha
+            cut = max(breaks) + 1
+        lines.append(rest[:cut].rstrip())
+        rest = rest[cut:].lstrip()
+    return "\n".join(lines)
+
+
+class _CardText(tkinter.Label):
+    """Texto de um card da Biblioteca: um tkinter.Label simples.
+
+    Um CTkLabel custa cerca de 3x mais para criar e desenhar (é um frame com
+    um canvas que imita o fundo) e uma pasta pode ter centenas de cards. O
+    card repassa as cores (tema, hover) e a escala de DPI por restyle().
+
+    Com max_lines, ocupa só a largura que o layout lhe dá (como o WrapLabel)
+    e corta o texto com reticências: nomes longos perdem o meio e mantêm o
+    fim ("goku_ultra_inst…(2).3mf"), que costuma diferenciar arquivos parecidos.
+    """
+
+    def __init__(self, card: ctk.CTkFrame, text: str, font: ctk.CTkFont,
+                 color: tuple[str, str], max_lines: int | None = None) -> None:
+        # Com corte, começa vazio: o texto inteiro pediria a largura dele e
+        # alargaria a coluna
+        super().__init__(card, text="" if max_lines else text, bd=0, padx=0, pady=0,
+                         highlightthickness=0, justify="center", cursor="hand2")
+        self._card = card
+        self._full_text = text
+        self._ctk_font = font
+        self._color = color
+        self._max_lines = max_lines
+        self._fitted_width = 0
+        self.restyle()
+        if max_lines:
+            self.bind("<Configure>", self._refit, add="+")
+
+    def restyle(self) -> None:
+        """Cores do tema e do fundo atual do card; fonte na escala atual."""
+        card = self._card
+        self.configure(bg=card._apply_appearance_mode(card.cget("fg_color")),
+                       fg=card._apply_appearance_mode(self._color),
+                       font=card._apply_font_scaling(self._ctk_font))
+
+    def _refit(self, event: tkinter.Event) -> None:
+        width = int(event.width / self._card._get_widget_scaling()) - 4
+        if width > 20 and width != self._fitted_width:
+            self._fitted_width = width
+            # CTkFont mede sem a escala de DPI, na mesma unidade de `width`
+            self.configure(text=elide(self._full_text, self._ctk_font.measure, width,
+                                      self._max_lines))
+
+
+class _ClickableCard(ctk.CTkFrame):
+    """Card da Biblioteca que reage ao mouse como um botão."""
+
+    def __init__(self, master, command: Callable[[], None]) -> None:
         super().__init__(master, cursor="hand2", **theme.CARD)
         self._command = command
         self._hover_job: str | None = None
-        self.grid_columnconfigure(0, weight=1)
+        self._texts: list[_CardText] = []
 
-        icon = ctk.CTkLabel(self, text="" if image else icon_text, image=image,
-                            font=ctk.CTkFont(family="Segoe UI Emoji", size=40),
-                            cursor="hand2")
-        icon.grid(row=0, column=0, pady=(18, 8))
-        name = WrapLabel(self, text=title, font=theme.font(14, "bold"),
-                         text_color=theme.TEXT, justify="center", anchor="center",
-                         wraplength=140, cursor="hand2")
-        name.grid(row=1, column=0, sticky="ew", padx=12)
-        info = ctk.CTkLabel(self, text=detail, font=theme.font(12),
-                            text_color=theme.TEXT_MUTED, cursor="hand2")
-        info.grid(row=2, column=0, pady=(2, 16))
+    def _text(self, text: str, font: ctk.CTkFont, color: tuple[str, str],
+              max_lines: int | None = None) -> _CardText:
+        label = _CardText(self, text, font, color, max_lines)
+        self._texts.append(label)
+        return label
 
-        for widget in (self, icon, name, info):
+    def _bind_children(self, *widgets: tkinter.Misc) -> None:
+        # O bind de um CTkFrame só pega o fundo: os filhos também precisam
+        for widget in (self, *widgets):
             widget.bind("<Enter>", self._on_enter, add="+")
             widget.bind("<Leave>", self._on_leave, add="+")
             widget.bind("<Button-1>", self._on_click, add="+")
 
+    def _set_colors(self, fg_color, border_color) -> None:
+        self.configure(fg_color=fg_color, border_color=border_color)
+        for label in self._texts:
+            label.restyle()
+
+    # O CustomTkinter avisa os widgets dele ao trocar o tema e a escala de
+    # DPI; os textos simples acompanham por aqui
+    def _set_appearance_mode(self, mode_string) -> None:
+        super()._set_appearance_mode(mode_string)
+        for label in self._texts:
+            label.restyle()
+
+    def _set_scaling(self, *args, **kwargs) -> None:
+        super()._set_scaling(*args, **kwargs)
+        for label in self._texts:
+            label.restyle()
+
     def _on_enter(self, _event=None) -> None:
-        self.configure(fg_color=theme.CARD_HOVER, border_color=theme.ACCENT)
+        self._set_colors(theme.CARD_HOVER, theme.ACCENT)
 
     def _on_leave(self, _event=None) -> None:
         # Passar do card para um filho também dispara <Leave>: confere depois
@@ -124,7 +221,7 @@ class Card(ctk.CTkFrame):
             if widget is self:
                 return
             widget = widget.master
-        self.configure(fg_color=theme.CARD_BG, border_color=theme.CARD_BORDER)
+        self._set_colors(theme.CARD_BG, theme.CARD_BORDER)
 
     def _on_click(self, _event=None) -> None:
         # Pela janela: a ação pode destruir este card (ex.: navegar)
@@ -134,6 +231,53 @@ class Card(ctk.CTkFrame):
         if self._hover_job is not None:
             self.after_cancel(self._hover_job)
         super().destroy()
+
+
+class Card(_ClickableCard):
+    """Card de pasta da Biblioteca: ícone, nome e detalhe."""
+
+    def __init__(self, master, image: ctk.CTkImage | None, icon_text: str,
+                 title: str, detail: str, command: Callable[[], None]) -> None:
+        super().__init__(master, command)
+        self.grid_columnconfigure(0, weight=1)
+
+        icon = ctk.CTkLabel(self, text="" if image else icon_text, image=image,
+                            font=ctk.CTkFont(family="Segoe UI Emoji", size=40),
+                            cursor="hand2")
+        icon.grid(row=0, column=0, pady=(18, 8))
+        name = self._text(title, theme.font(14, "bold"), theme.TEXT, max_lines=3)
+        name.grid(row=1, column=0, sticky="ew", padx=12)
+        info = self._text(detail, theme.font(12), theme.TEXT_MUTED)
+        info.grid(row=2, column=0, pady=(2, 16))
+        self._bind_children(icon, name, info)
+
+
+class ThumbnailCard(_ClickableCard):
+    """Card de arquivo da Biblioteca: miniatura, nome (até 2 linhas) e tamanho.
+
+    A miniatura chega depois, por set_image(), carregada em segundo plano;
+    até lá aparece só o fundo do quadro.
+    """
+
+    def __init__(self, master, title: str, detail: str, command: Callable[[], None],
+                 tile_height: int) -> None:
+        super().__init__(master, command)
+        self.grid_columnconfigure(0, weight=1)
+        # Num card esticado pela linha, a sobra fica sob o nome: os tamanhos
+        # dos cards da mesma linha ficam alinhados embaixo
+        self.grid_rowconfigure(1, weight=1)
+
+        self.tile = ctk.CTkLabel(self, text="", height=tile_height, corner_radius=8,
+                                 fg_color=theme.THUMB_BG, cursor="hand2")
+        self.tile.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 8))
+        name = self._text(title, theme.font(13, "bold"), theme.TEXT, max_lines=2)
+        name.grid(row=1, column=0, sticky="new", padx=10)
+        info = self._text(detail, theme.font(12), theme.TEXT_MUTED)
+        info.grid(row=2, column=0, pady=(2, 10))
+        self._bind_children(self.tile, name, info)
+
+    def set_image(self, image: ctk.CTkImage) -> None:
+        self.tile.configure(image=image)
 
 
 def ghost_button(master, text: str, command: Callable[[], None], **kwargs) -> ctk.CTkButton:

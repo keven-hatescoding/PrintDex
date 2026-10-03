@@ -48,6 +48,7 @@ from printdex.ui.library import LibraryView
 from printdex.ui.onboarding import OnboardingDialog
 from printdex.ui.settings import SettingsView
 from printdex.ui.sidebar import Sidebar
+from printdex.ui.thumbnails import ThumbnailLoader
 from printdex.ui.tray import TrayIcon
 from printdex.ui.tray import available as tray_available
 
@@ -103,6 +104,8 @@ class PrintDexApp(ctk.CTk):
         self.theme = DEFAULT_THEME
         self.currency = DEFAULT_CURRENCY
         self.icons = IconCache()
+        # Miniaturas da Biblioteca: o cache sobrevive à troca de idioma
+        self.thumbnails = ThumbnailLoader(self._call_ui)
         # Calculadora: as variáveis são do app (sobrevivem à troca de idioma)
         self.calc_vars = {name: ctk.StringVar() for name in CALC_FIELDS}
         self.calc_vars["quantity"].set("1")

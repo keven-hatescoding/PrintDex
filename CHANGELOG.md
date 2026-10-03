@@ -5,6 +5,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 🇧🇷 Versão em português abaixo de cada versão.
 
+## [1.2-BETA] — 2026-10-03 · Library thumbnails
+
+### Added
+- 🖼️ **Model thumbnails in the Library.** Files now show the same preview Windows Explorer shows (Windows Shell thumbnails, read through `ctypes` — no new dependencies). When Windows has none, PrintDex uses the image that slicers (Bambu Studio, PrusaSlicer, OrcaSlicer…) embed inside `.3mf` files; otherwise a generic 3D-file icon with the extension (STL / 3MF / OBJ).
+- File cards show the thumbnail, the name (up to two lines, long names are shortened in the middle so the end — e.g. `(2).3mf` — stays visible) and the file size.
+
+### Changed
+- Thumbnails load in the background and are cached in memory, so the window never waits for them and going back to a folder is instant.
+- Large folders open without freezing: cards are drawn in small timed batches and old cards are removed gradually. A 120-file folder used to freeze the window for about 4 seconds.
+- The build self-test (`--self-test`) now also checks Windows thumbnail extraction inside the packaged `.exe`.
+
+### Notes
+- The 1.2-BETA installer installs over 1.1-BETA and keeps your settings and models.
+- `.stl` and `.obj` files only get a real thumbnail if some program registered a Windows thumbnail handler for them (e.g. 3D Viewer or a slicer); otherwise they show the generic icon.
+
+#### 🇧🇷 Em português
+- **Novo:** miniaturas dos modelos na Biblioteca — a mesma pré-visualização do Explorer do Windows (via `ctypes`, sem dependências novas). Sem miniatura do Windows, o PrintDex usa a imagem que os fatiadores gravam dentro do `.3mf`; senão, um ícone genérico de arquivo 3D com a extensão. Os cards mostram a miniatura, o nome (até duas linhas, cortando o meio para manter o fim visível) e o tamanho.
+- **Alterado:** as miniaturas carregam em segundo plano e ficam em cache; pastas grandes abrem sem congelar a janela (uma pasta com 120 arquivos travava a tela por cerca de 4 segundos). O autodiagnóstico do build também testa as miniaturas dentro do `.exe`.
+- **Observação:** o instalador 1.2-BETA instala por cima da 1.1-BETA mantendo configurações e modelos. Arquivos `.stl` e `.obj` só têm miniatura real se algum programa (ex.: Visualizador 3D ou um fatiador) registrou um gerador de miniaturas no Windows; senão mostram o ícone genérico.
+
 ## [1.1-BETA] — 2026-10-02 · Hotfix
 
 ### Fixed
@@ -41,5 +61,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### 🇧🇷 Em português
 Primeira versão beta pública: organizador automático com IA (Gemini) com varredura inicial, 8 categorias fixas, deduplicação byte a byte, calculadora de impressão 3D (modos Simples e Avançado), biblioteca visual, bandeja do sistema, configuração inicial, três idiomas, quatro moedas, temas e instalador para Windows.
 
-[1.1-BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.1-BETA
+[1.2-BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.2-BETA
+[1.1-BETA]: https://github.com/keven-hatescoding/PrintDex/tree/v1.1-BETA
 [1.0BETA]: https://github.com/keven-hatescoding/PrintDex/releases/tag/v1.0BETA
