@@ -1,5 +1,5 @@
 ﻿; Receita do Inno Setup para o instalador do SliceMind DEX.
-; Gerado pelo build.ps1, que passa /DVersao=1.3.0 (numérica) e /DRelease=1.3-BETA
+; Gerado pelo build.ps1, que passa /DVersao=1.4.0 (numérica) e /DRelease=1.4-BETA
 ; (nome do lançamento). Também pode ser compilado à mão no Inno Setup depois
 ; de gerar o dist\SliceMindDex.exe: nesse caso as duas são lidas do próprio .exe.
 

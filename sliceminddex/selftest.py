@@ -66,6 +66,16 @@ def _checks():
             raise RuntimeError(f"cores trocadas na conversão da miniatura: {color}")
         return f"Windows Shell ok ({image.width}x{image.height})"
 
+    def api_tutorial():
+        from PIL import Image
+        from sliceminddex.config import API_TUTORIAL_GIF
+        if not API_TUTORIAL_GIF.is_file():
+            return "sem docs/api_tutorial.gif: a janela de ajuda mostra só os textos"
+        with Image.open(API_TUTORIAL_GIF) as gif:
+            gif.seek(0)
+            gif.convert("RGBA")  # o primeiro quadro decodifica
+            return f"GIF {gif.size[0]}x{gif.size[1]}, {getattr(gif, 'n_frames', 1)} quadros"
+
     def folder_watcher():
         from watchdog.observers import Observer
         name = Observer.__name__
@@ -126,6 +136,7 @@ def _checks():
         ("Ícone do app", app_icon),
         ("Fonte de emojis", emoji_font),
         ("Miniaturas (Windows Shell)", thumbnails),
+        ("Tutorial da API Key (GIF)", api_tutorial),
         ("Monitor de pastas (Watchdog)", folder_watcher),
         ("Bandeja (pystray)", tray),
         ("Banco de dados (SQLite)", database),

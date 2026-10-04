@@ -5,6 +5,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 🇧🇷 Versão em português abaixo de cada versão.
 
+## [1.4-BETA] — 2026-10-04 · API key help
+
+### Added
+- **Friendlier Gemini API key setup.** Starting monitoring without a key now opens a short explanation (the key stays on your computer and is never sent to us) with an **Add API key** button that jumps to the field in Settings.
+- A green **?** next to the API key field shows a tip on hover and opens **How to get your API key**: the Gemini API is free, a button to Google AI Studio, a warning to never share the key, and a step-by-step animation (`docs/api_tutorial.gif`, optional).
+- The animation plays in a background thread with constant memory, so the window never freezes, even with long screen recordings.
+
+### Fixed
+- Building from source (`build.ps1`) no longer refuses to run while the installed SliceMind DEX is open; it only stops if `dist\SliceMindDex.exe` itself is running.
+
+#### 🇧🇷 Em português
+- **Configuração da API Key mais amigável:** iniciar o monitoramento sem a chave abre uma explicação curta (a chave fica no seu computador e nunca é enviada para nós) com o botão **Adicionar API**, que leva ao campo nas Configurações.
+- Um **?** verde ao lado do campo mostra uma dica ao passar o mouse e abre **Como obter sua API Key**: a API é gratuita, botão para o Google AI Studio, aviso para nunca divulgar a chave e um passo a passo animado (`docs/api_tutorial.gif`, opcional), que roda em segundo plano sem travar a janela.
+- **Corrigido:** o `build.ps1` não se recusa mais a gerar o executável com o SliceMind DEX instalado aberto; só para se o próprio `dist\SliceMindDex.exe` estiver rodando.
+
 ## [1.3-BETA] — 2026-10-03 · SliceMind DEX
 
 ### Changed
@@ -89,7 +104,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### 🇧🇷 Em português
 Primeira versão beta pública: organizador automático com IA (Gemini) com varredura inicial, 8 categorias fixas, deduplicação byte a byte, calculadora de impressão 3D (modos Simples e Avançado), biblioteca visual, bandeja do sistema, configuração inicial, três idiomas, quatro moedas, temas e instalador para Windows.
 
-[1.3-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.3-BETA
+[1.4-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/releases/tag/v1.4-BETA
+[1.3-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.3-BETA
 [1.2.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.2.1-BETA
 [1.2-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.2-BETA
 [1.1-BETA]: https://github.com/keven-hatescoding/SliceMind-DEX/tree/v1.1-BETA

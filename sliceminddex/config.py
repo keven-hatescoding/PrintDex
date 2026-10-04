@@ -39,6 +39,9 @@ LEGACY_DB_PATHS = (
 # PyInstaller, na pasta temporária onde ele se extrai (sys._MEIPASS)
 RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
 APP_ICON = RESOURCE_DIR / "app_icon.ico"
+# Passo a passo animado da janela "Como obter sua API Key". Opcional: sem
+# ele a janela mostra só os textos (o .spec só o embute se existir).
+API_TUTORIAL_GIF = RESOURCE_DIR / "docs" / "api_tutorial.gif"
 
 # Toda a árvore gerada pela IA fica dentro de uma pasta PRINTS.
 PRINTS_FOLDER = "PRINTS"
@@ -81,6 +84,8 @@ SUPPORTED_EXTENSIONS = {".stl", ".3mf", ".obj"}
 # mais lento e caro). Modelos vigentes:
 # https://ai.google.dev/gemini-api/docs/deprecations
 GEMINI_MODEL = "gemini-3.5-flash-lite"
+# Onde o usuário gera a API Key (gratuita) no site do Google
+GEMINI_API_KEY_URL = "https://aistudio.google.com/app/apikey"
 GEMINI_TIMEOUT_MS = 20_000
 GEMINI_ATTEMPTS = 3  # novas tentativas automáticas em 429/5xx
 # Máximo de chamadas por minuto feitas pelo app. A varredura inicial pode

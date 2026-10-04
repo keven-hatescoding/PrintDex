@@ -10,7 +10,7 @@ from sliceminddex.config import APP_DATA_DIR, GEMINI_MODEL, THEMES
 from sliceminddex.core.calculator import CURRENCIES, currency_symbol
 from sliceminddex.locales import LANGUAGES, get_language, t
 from sliceminddex.ui import theme
-from sliceminddex.ui.widgets import Section, ViewHeader, WrapLabel, ghost_button
+from sliceminddex.ui.widgets import Section, Tooltip, ViewHeader, WrapLabel, ghost_button
 
 
 class SettingsView(ctk.CTkFrame):
@@ -30,9 +30,11 @@ class SettingsView(ctk.CTkFrame):
         body.grid(row=1, column=0, sticky="nsew")
         body.grid_columnconfigure(0, weight=1)
 
+        self._body = body
         self._build_appearance(body).grid(row=0, column=0, sticky="ew", pady=(0, 14))
         self._build_folders(body).grid(row=1, column=0, sticky="ew", pady=(0, 14))
-        self._build_ai(body).grid(row=2, column=0, sticky="ew", pady=(0, 14))
+        self._ai_section = self._build_ai(body)
+        self._ai_section.grid(row=2, column=0, sticky="ew", pady=(0, 14))
         self._build_about(body).grid(row=3, column=0, sticky="ew", pady=(0, 6))
 
     def _build_appearance(self, parent) -> Section:
@@ -95,12 +97,37 @@ class SettingsView(ctk.CTkFrame):
                                       height=36, font=theme.font(13))
         self.key_entry.grid(row=0, column=0, sticky="ew")
         self.key_entry.bind("<Return>", lambda _e: self.app.save_api_key(), add="+")
+        # "?" redondo e em destaque: abre o passo a passo de como conseguir a chave
+        self.help_button = ctk.CTkButton(
+            row, text="?", width=36, height=36, corner_radius=18,
+            font=theme.font(17, "bold"), fg_color=theme.ACCENT,
+            hover_color=theme.ACCENT_HOVER, text_color=theme.ON_ACCENT,
+            command=self.app.open_api_tutorial)
+        self.help_button.grid(row=0, column=1, padx=(8, 0))
+        self.help_tip = Tooltip(self.help_button, t("apikey.help"))
         self.show_button = ghost_button(row, t("set.show"), self._toggle_key,
                                         width=92, height=36)
-        self.show_button.grid(row=0, column=1, padx=(8, 0))
+        self.show_button.grid(row=0, column=2, padx=(8, 0))
         ctk.CTkButton(row, text=t("set.save"), width=92, height=36, font=theme.font(13),
-                      command=self.app.save_api_key).grid(row=0, column=2, padx=(8, 0))
+                      command=self.app.save_api_key).grid(row=0, column=3, padx=(8, 0))
         return section
+
+    def focus_api_key(self) -> None:
+        """Rola até a API Key, põe o cursor no campo e o destaca por um instante."""
+        self.update_idletasks()
+        canvas = self._body._parent_canvas
+        top = self._ai_section.winfo_y() / max(1, self._body.winfo_height())
+        canvas.yview_moveto(max(0.0, top - 0.02))
+        self.key_entry.focus_set()
+        self.key_entry.configure(border_color=theme.ACCENT, border_width=2)
+        self.after(1800, self._unhighlight_key)
+
+    def _unhighlight_key(self) -> None:
+        if self.key_entry.winfo_exists():
+            # Volta à borda padrão do tema
+            self.key_entry.configure(
+                border_color=ctk.ThemeManager.theme["CTkEntry"]["border_color"],
+                border_width=ctk.ThemeManager.theme["CTkEntry"]["border_width"])
 
     def _build_about(self, parent) -> Section:
         section = Section(parent, t("set.about"))

@@ -22,7 +22,8 @@ from sliceminddex.locales import t, tn
 from sliceminddex.ui import theme
 from sliceminddex.ui.icons import FILE_ICON, FOLDER_ICON, category_icon
 from sliceminddex.ui.thumbnails import MISSING
-from sliceminddex.ui.widgets import Card, ThumbnailCard, ViewHeader, WrapLabel, ghost_button
+from sliceminddex.ui.widgets import (Card, ThumbnailCard, ViewHeader, WrapLabel, fit_size,
+                                      ghost_button)
 
 CARD_WIDTH = 172  # largura mínima de um card, antes da escala de DPI
 CARD_GAP = 12
@@ -68,12 +69,6 @@ def _size_text(size: int) -> str:
             return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
         size /= 1024
     return ""
-
-
-def _fit(size: tuple[int, int], box: tuple[int, int]) -> tuple[int, int]:
-    """Tamanho que cabe em `box` mantendo a proporção."""
-    scale = min(box[0] / size[0], box[1] / size[1])
-    return max(1, round(size[0] * scale)), max(1, round(size[1] * scale))
 
 
 def _list_folder(folder: Path) -> list[_Entry]:
@@ -320,7 +315,7 @@ class LibraryView(ctk.CTkFrame):
         if generation != self._generation:
             return  # chegou depois que o usuário saiu da pasta
         if image is not None:
-            card.set_image(ctk.CTkImage(image, image, size=_fit(image.size, THUMB_BOX)))
+            card.set_image(ctk.CTkImage(image, image, size=fit_size(image.size, THUMB_BOX)))
             return
         # Sem miniatura: cubo de arquivo 3D (ou a folha, para outros arquivos)
         extension = os.path.splitext(name)[1].lower()

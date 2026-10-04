@@ -1,11 +1,22 @@
 """Widgets reutilizáveis da interface."""
 
+import queue
+import threading
+import time
 import tkinter
 from collections.abc import Callable
+from pathlib import Path
 
 import customtkinter as ctk
+from PIL import Image, ImageSequence
 
 from sliceminddex.ui import theme
+
+
+def fit_size(size: tuple[int, int], box: tuple[int, int]) -> tuple[int, int]:
+    """Tamanho que cabe em `box` mantendo a proporção."""
+    scale = min(box[0] / size[0], box[1] / size[1])
+    return max(1, round(size[0] * scale)), max(1, round(size[1] * scale))
 
 
 class WrapLabel(ctk.CTkLabel):
@@ -296,3 +307,177 @@ def ghost_button(master, text: str, command: Callable[[], None], **kwargs) -> ct
                    text_color_disabled=theme.TEXT_DISABLED, font=theme.font(13))
     options.update(kwargs)
     return ctk.CTkButton(master, text=text, command=command, **options)
+
+
+class Tooltip:
+    """Balão de dica ao lado de um widget do CustomTkinter, com o mouse em cima.
+
+    Um widget do CustomTkinter é feito de várias partes (canvas, texto):
+    passar de uma para outra gera <Leave> e <Enter> seguidos. Por isso a
+    saída é conferida pela posição do mouse, sem o balão piscar.
+    """
+
+    DELAY_MS = 150
+
+    def __init__(self, widget: ctk.CTkBaseClass, text: str) -> None:
+        self.widget = widget
+        self.text = text
+        self._tip: tkinter.Toplevel | None = None
+        self._job: str | None = None
+        widget.bind("<Enter>", self._on_enter, add="+")
+        widget.bind("<Leave>", self._on_leave, add="+")
+        widget.bind("<ButtonPress>", lambda _e: self.hide(), add="+")
+
+    def _on_enter(self, _event=None) -> None:
+        if self._tip is None and self._job is None:
+            self._job = self.widget.after(self.DELAY_MS, self.show)
+
+    def _on_leave(self, _event=None) -> None:
+        self.widget.after(40, self._check_pointer)
+
+    def _check_pointer(self) -> None:
+        try:
+            widget = self.widget.winfo_containing(*self.widget.winfo_pointerxy())
+        except (KeyError, tkinter.TclError):  # ponteiro sobre um menu, janela fechada
+            widget = None
+        while widget is not None:
+            if widget is self.widget:
+                return  # ainda em cima (passou de uma parte do botão para outra)
+            widget = widget.master
+        self.hide()
+
+    def show(self) -> None:
+        self._job = None
+        if self._tip is not None or not self.widget.winfo_ismapped():
+            return
+        widget = self.widget
+        tip = tkinter.Toplevel(widget)
+        tip.overrideredirect(True)  # sem barra de título nem borda
+        tip.attributes("-topmost", True)
+        tkinter.Label(tip, text=self.text, justify="left", padx=10, pady=6, bd=0,
+                      bg=widget._apply_appearance_mode(theme.TOOLTIP_BG),
+                      fg=widget._apply_appearance_mode(theme.TOOLTIP_TEXT),
+                      font=widget._apply_font_scaling(theme.font(12, "bold"))).pack()
+        tip.update_idletasks()
+        # À direita do widget, centralizado na altura; sem espaço, à esquerda
+        gap = round(8 * widget._get_widget_scaling())
+        x = widget.winfo_rootx() + widget.winfo_width() + gap
+        if x + tip.winfo_reqwidth() > widget.winfo_screenwidth():
+            x = widget.winfo_rootx() - gap - tip.winfo_reqwidth()
+        y = widget.winfo_rooty() + (widget.winfo_height() - tip.winfo_reqheight()) // 2
+        tip.geometry(f"+{max(0, x)}+{max(0, y)}")
+        self._tip = tip
+
+    def hide(self) -> None:
+        if self._job is not None:
+            self.widget.after_cancel(self._job)
+            self._job = None
+        if self._tip is not None:
+            self._tip.destroy()
+            self._tip = None
+
+
+_STATIC = object()  # a imagem tem um quadro só: nada mais a tocar
+_FAILED = object()  # arquivo ilegível
+
+
+class GifPlayer(ctk.CTkLabel):
+    """Toca um GIF animado em loop, sem travar a interface.
+
+    Uma thread lê e reduz os quadros (o Pillow solta o GIL ao decodificar e
+    redimensionar) e os passa por uma fila curta; a thread da interface só
+    troca a imagem na hora de cada quadro, com after(). A memória fica
+    constante mesmo num GIF longo: só alguns quadros prontos por vez, em vez
+    do GIF inteiro descompactado (uma gravação de tela passaria de 200 MB).
+
+    Sem o arquivo, ou com um arquivo ilegível, mostra `missing_text`.
+    """
+
+    BUFFER = 4  # quadros prontos à frente
+
+    def __init__(self, master, path: Path, max_size: tuple[int, int],
+                 missing_text: str = "", **kwargs) -> None:
+        super().__init__(master, text="", **kwargs)
+        self._missing_text = missing_text
+        self._frames: queue.Queue = queue.Queue(maxsize=self.BUFFER)
+        self._stop = threading.Event()
+        self._job: str | None = None
+        self._due: float | None = None  # hora em que o próximo quadro deve aparecer
+        self.size: tuple[int, int] | None = None  # tamanho exibido, sem a escala de DPI
+        try:
+            with Image.open(path) as gif:  # só o cabeçalho: rápido
+                self.size = fit_size(gif.size, max_size)
+        except (OSError, ValueError):
+            self._show_missing()
+            return
+        scaling = self._get_widget_scaling()
+        pixels = (round(self.size[0] * scaling), round(self.size[1] * scaling))
+        self.configure(width=self.size[0], height=self.size[1])  # reserva o espaço já
+        threading.Thread(target=self._decode, args=(Path(path), pixels),
+                         name="SliceMindDex-Gif", daemon=True).start()
+        self._job = self.after(10, self._tick)
+
+    # -------------------------------------------------- thread de leitura
+
+    def _decode(self, path: Path, pixels: tuple[int, int]) -> None:
+        try:
+            with Image.open(path) as gif:
+                while not self._stop.is_set():
+                    count = 0
+                    for frame in ImageSequence.Iterator(gif):
+                        duration = frame.info.get("duration") or 0
+                        image = frame.convert("RGBA").resize(pixels, Image.Resampling.LANCZOS)
+                        # Como os navegadores: tempos de até 10 ms valem 100 ms
+                        if not self._put((image, duration if duration > 10 else 100)):
+                            return
+                        count += 1
+                    if count <= 1:
+                        self._put(_STATIC)
+                        return
+        except Exception:  # GIF corrompido: mostra o texto no lugar
+            self._put(_FAILED)
+
+    def _put(self, item) -> bool:
+        """Entrega à interface; False se o player foi fechado."""
+        while not self._stop.is_set():
+            try:
+                self._frames.put(item, timeout=0.2)
+                return True
+            except queue.Full:
+                continue
+        return False
+
+    # ---------------------------------------------------- thread da tela
+
+    def _tick(self) -> None:
+        self._job = None
+        try:
+            item = self._frames.get_nowait()
+        except queue.Empty:
+            self._job = self.after(10, self._tick)  # a leitura está um pouco atrás
+            return
+        if item is _STATIC:
+            return
+        if item is _FAILED:
+            self._show_missing()
+            return
+        image, duration = item
+        self.configure(image=ctk.CTkImage(image, image, size=self.size))
+        # Cada quadro tem hora marcada (a anterior + a duração): o tempo de
+        # trocar a imagem não se acumula e o GIF anda no ritmo do arquivo.
+        # Muito atrasado (ex.: janela arrastada), recomeça a contar de agora.
+        now = time.perf_counter()
+        if self._due is None or now - self._due > 0.5:
+            self._due = now
+        self._due += duration / 1000
+        self._job = self.after(max(1, round((self._due - now) * 1000)), self._tick)
+
+    def _show_missing(self) -> None:
+        self.configure(image=None, text=self._missing_text, width=0, height=0)
+
+    def destroy(self) -> None:
+        self._stop.set()  # a thread de leitura termina em até 0,2 s
+        if self._job is not None:
+            self.after_cancel(self._job)
+            self._job = None
+        super().destroy()

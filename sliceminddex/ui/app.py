@@ -41,6 +41,7 @@ from sliceminddex.core.database import FIELDS, SettingsDB
 from sliceminddex.core.service import MonitorService, Stats
 from sliceminddex.locales import Msg, t
 from sliceminddex.ui import theme
+from sliceminddex.ui.api_key_help import ApiKeyRequiredDialog, ApiTutorialWindow
 from sliceminddex.ui.calculator import CalculatorView
 from sliceminddex.ui.dashboard import DashboardView
 from sliceminddex.ui.icons import IconCache
@@ -122,6 +123,9 @@ class SliceMindDexApp(ctk.CTk):
         self.views: dict[str, ctk.CTkFrame] = {}
         self.tray: TrayIcon | None = None
         self._tray_hint_shown = False
+        # Janelas de ajuda da API Key (uma de cada por vez)
+        self._api_dialog: ApiKeyRequiredDialog | None = None
+        self._tutorial: ApiTutorialWindow | None = None
 
         self.service = MonitorService(
             on_log=self.log,
@@ -529,8 +533,13 @@ class SliceMindDexApp(ctk.CTk):
         dest = self.dest_var.get()
         api_key = self.api_key_var.get().strip()
 
+        # Sem a chave a IA não funciona: em vez de só um erro no log, um aviso
+        # explica e leva direto ao campo (muita gente nunca ouviu falar dela)
+        if not api_key:
+            self.ask_api_key()
+            return
         missing = [Msg(f"field.{field}") for field, value in (
-            ("pasta_origem", source), ("pasta_destino", dest), ("api_key", api_key),
+            ("pasta_origem", source), ("pasta_destino", dest),
         ) if not value]
         if missing:
             self.log(Msg("log.start_missing", fields=missing))
@@ -551,6 +560,29 @@ class SliceMindDexApp(ctk.CTk):
 
     def stop_monitoring(self) -> None:
         self.service.stop()
+
+    # ------------------------------------------------------------ API Key
+
+    def ask_api_key(self) -> None:
+        """Aviso de que falta a API Key, com o botão "Adicionar API"."""
+        if self._api_dialog is not None and self._api_dialog.winfo_exists():
+            self._api_dialog.bring_to_front()
+            return
+        if self.state() in ("withdrawn", "iconic"):  # iniciado pela bandeja
+            self.show_window()
+        self._api_dialog = ApiKeyRequiredDialog(self)
+
+    def open_api_key_settings(self) -> None:
+        """Configurações, com o cursor já no campo da API Key."""
+        self.show_view("settings")
+        self.settings.focus_api_key()
+
+    def open_api_tutorial(self) -> None:
+        """Janela "Como obter sua API Key" (uma só, mesmo clicando de novo)."""
+        if self._tutorial is not None and self._tutorial.winfo_exists():
+            self._tutorial.show()
+            return
+        self._tutorial = ApiTutorialWindow(self)
 
     # --------------------------------------------------------------- ações
 
@@ -598,8 +630,9 @@ class SliceMindDexApp(ctk.CTk):
             self.stop_monitoring()
         elif self.service.state == "stopped":
             self.start_monitoring()
-            if self.service.state != "running":  # não iniciou: o motivo está no log
-                self.show_view("dashboard")
+            asking_key = self._api_dialog is not None and self._api_dialog.winfo_exists()
+            if self.service.state != "running" and not asking_key:
+                self.show_view("dashboard")  # não iniciou: o motivo está no log
                 self.show_window()
 
     def quit_app(self) -> None:

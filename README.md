@@ -32,12 +32,28 @@
 ---
 
 <p align="center">
-  <img src="docs/screenshots/sliceminddex/library-thumbnails.png" alt="SliceMind DEX Library with model thumbnails" width="880">
+  <img src="docs/screenshots/v1.4/library-thumbnails.png" alt="SliceMind DEX Library with model thumbnails" width="880">
 </p>
 
 Every week you download dozens of `.stl`, `.3mf` and `.obj` files — and your Downloads folder turns into a graveyard of `final_v2_FIXED (3).stl`. **SliceMind DEX** watches that folder for you, asks Google Gemini what each model is, and files it into a clean, browsable library: **category → franchise → item type**, with a tidy file name. It also tells you how much to charge for each print.
 
 ## 📝 What's New
+
+**1.4-BETA** — help with the Gemini API key:
+
+- 🔑 **No more guessing.** If you click **Start Monitoring** without an API key, SliceMind DEX explains what it is (it stays on your computer and is never sent to us) and the **Add API key** button takes you straight to the field in Settings.
+- ❓ **Step-by-step guide.** A green **?** next to the API key field opens **How to get your API key**: the Gemini API is free, a button to Google AI Studio, a reminder to never share your key and an animated walkthrough.
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/v1.4/api-key-required.png" alt="API key required dialog"></td>
+    <td><img src="docs/screenshots/v1.4/api-key-tutorial.png" alt="How to get your API key window"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Starting without a key</em></td>
+    <td align="center"><em>How to get your API key</em></td>
+  </tr>
+</table>
 
 **1.3-BETA** — *PrintDex* is now **SliceMind DEX**:
 
@@ -70,16 +86,16 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/sliceminddex/library-categories.png" alt="Library categories"></td>
-    <td><img src="docs/screenshots/sliceminddex/dashboard.png" alt="Dashboard"></td>
+    <td><img src="docs/screenshots/v1.4/library-categories.png" alt="Library categories"></td>
+    <td><img src="docs/screenshots/v1.4/dashboard.png" alt="Dashboard"></td>
   </tr>
   <tr>
     <td align="center"><em>Library — locked categories</em></td>
     <td align="center"><em>Dashboard — real-time activity</em></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/sliceminddex/calculator-advanced.png" alt="Advanced calculator"></td>
-    <td><img src="docs/screenshots/sliceminddex/library-thumbnails-light.png" alt="Library thumbnails in the light theme"></td>
+    <td><img src="docs/screenshots/v1.4/calculator-advanced.png" alt="Advanced calculator"></td>
+    <td><img src="docs/screenshots/v1.4/library-thumbnails-light.png" alt="Library thumbnails in the light theme"></td>
   </tr>
   <tr>
     <td align="center"><em>Calculator — Advanced mode</em></td>
@@ -107,7 +123,7 @@ Full history: [CHANGELOG.md](CHANGELOG.md).
    - **Library folder (PRINTS)** — already filled with the app's default. ⚠️ **Keeping the default is strongly recommended.**
 
    Click **Finish** and the app opens.
-2. **Add your Gemini API key.** Get a free key at [Google AI Studio](https://aistudio.google.com/apikey), then go to **Settings → Artificial intelligence**, paste it into **Gemini API key** and click **Save**. The key is stored only on your computer.
+2. **Add your Gemini API key.** Get a free key at [Google AI Studio](https://aistudio.google.com/apikey), then go to **Settings → Artificial intelligence**, paste it into **Gemini API key** and click **Save**. The key is stored only on your computer. Never used an API key? Click the green **?** next to the field for a step-by-step guide — and if you try to start monitoring without a key, the app explains what to do and takes you straight to the field.
 3. **Start monitoring.** On the **Dashboard**, click **Start Monitoring**. New downloads are analyzed and moved automatically; the activity log shows every step.
 4. **Browse and quote.** Use the **Library** to explore your models and the **Calculator** to price a print.
 5. **Background mode.** Closing or minimizing the window sends SliceMind DEX to the system tray (on Windows 11 the icon may be under the **^** arrow). Click the icon to reopen it; right-click → **Exit** to quit for good.
@@ -149,6 +165,11 @@ Released under the [MIT License](LICENSE).
 Toda semana você baixa dezenas de arquivos `.stl`, `.3mf` e `.obj`, e a pasta Downloads vira um cemitério de `final_v2_CORRIGIDO (3).stl`. O **SliceMind DEX** vigia essa pasta por você, pergunta ao Google Gemini o que é cada modelo e o arquiva numa biblioteca limpa e navegável: **categoria → franquia → tipo de item**, com um nome de arquivo organizado. E ainda calcula quanto cobrar por cada impressão.
 
 ## 📝 Novidades
+
+**1.4-BETA** — ajuda com a API Key do Gemini:
+
+- 🔑 **Sem adivinhação.** Se você clicar em **Iniciar Monitoramento** sem a API Key, o SliceMind DEX explica o que é (ela fica no seu computador e nunca é enviada para nós) e o botão **Adicionar API** leva direto ao campo nas Configurações.
+- ❓ **Passo a passo.** Um **?** verde ao lado do campo da API Key abre **Como obter sua API Key**: a API do Gemini é gratuita, um botão para o Google AI Studio, o lembrete de nunca divulgar a sua chave e um passo a passo animado.
 
 **1.3-BETA** — o *PrintDex* agora se chama **SliceMind DEX**:
 
@@ -199,7 +220,7 @@ Histórico completo: [CHANGELOG.md](CHANGELOG.md).
    - **Pasta da biblioteca (PRINTS)** — já preenchida com o padrão do app. ⚠️ **É altamente recomendado manter o diretório padrão.**
 
    Clique em **Concluir** e o app abre.
-2. **Cadastre sua API Key do Gemini.** Gere uma chave gratuita no [Google AI Studio](https://aistudio.google.com/apikey), vá em **Configurações → Inteligência artificial**, cole em **API Key do Gemini** e clique em **Salvar**. A chave fica salva só no seu computador.
+2. **Cadastre sua API Key do Gemini.** Gere uma chave gratuita no [Google AI Studio](https://aistudio.google.com/apikey), vá em **Configurações → Inteligência artificial**, cole em **API Key do Gemini** e clique em **Salvar**. A chave fica salva só no seu computador. Nunca usou uma API Key? Clique no **?** verde ao lado do campo para ver o passo a passo — e, se tentar iniciar o monitoramento sem a chave, o app explica o que fazer e leva você direto ao campo.
 3. **Inicie o monitoramento.** No **Painel**, clique em **Iniciar Monitoramento**. Os novos downloads são analisados e movidos automaticamente; o log de atividade mostra cada passo.
 4. **Explore e faça orçamentos.** Use a **Biblioteca** para navegar pelos modelos e a **Calculadora** para precificar uma impressão.
 5. **Segundo plano.** Fechar ou minimizar a janela manda o SliceMind DEX para a bandeja do sistema (no Windows 11 o ícone pode ficar sob a seta **^**). Clique no ícone para reabrir; botão direito → **Sair** para encerrar de vez.

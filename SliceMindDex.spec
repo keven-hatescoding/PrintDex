@@ -3,11 +3,17 @@
 # Use o build.bat (ou build.ps1), que também gera as informações de versão.
 # Os temas do CustomTkinter são incluídos pelo hook dele no PyInstaller.
 
+import os
+
+# O passo a passo animado da API Key é opcional: sem ele a janela de ajuda
+# mostra só os textos (config.API_TUTORIAL_GIF)
+TUTORIAL_GIF = [("docs/api_tutorial.gif", "docs")] if os.path.isfile("docs/api_tutorial.gif") else []
+
 a = Analysis(
     ["main.py"],
     # A janela e o ícone da bandeja carregam o ícone em tempo de execução
     # (config.APP_ICON)
-    datas=[("app_icon.ico", ".")],
+    datas=[("app_icon.ico", ".")] + TUTORIAL_GIF,
     # O pystray escolhe o backend do sistema em tempo de execução (importlib):
     # o do Windows precisa ser declarado (o hook do pystray também o inclui)
     hiddenimports=["pystray._win32"],

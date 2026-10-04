@@ -11,9 +11,11 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-# O .exe antigo não pode ser substituído enquanto estiver aberto
-if (Get-Process -Name "SliceMindDex" -ErrorAction SilentlyContinue) {
-    throw "Feche o SliceMind DEX antes de gerar o executável."
+# O dist\SliceMindDex.exe não pode ser substituído enquanto estiver aberto.
+# O SliceMind DEX instalado (Program Files) é outro arquivo: pode ficar aberto.
+$distExe = Join-Path $PSScriptRoot "dist\SliceMindDex.exe"
+if (Get-Process -Name "SliceMindDex" -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $distExe }) {
+    throw "Feche o dist\SliceMindDex.exe antes de gerar o executável."
 }
 
 # A versão vem do próprio app (sliceminddex\__init__.py): __version__ é a numérica

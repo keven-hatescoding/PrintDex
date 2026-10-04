@@ -23,6 +23,10 @@ CARD_BG = ("#FFFFFF", "#22262B")
 CARD_HOVER = ("#F1FAF4", "#2A3037")
 CARD_BORDER = ("#E1E4E8", "#2F343B")
 THUMB_BG = ("#F2F4F6", "#1A1D21")  # fundo da miniatura dentro do card
+# Dicas (tooltip): contraste invertido, destacam sobre qualquer fundo
+TOOLTIP_BG = ("#1F2328", "#E8EAED")
+TOOLTIP_TEXT = ("#FFFFFF", "#15171A")
+WARNING_TEXT = ("#B26A00", "#FFB547")  # avisos importantes (ex.: segredo da API Key)
 TEXT = ("#15171A", "#E8EAED")
 TEXT_MUTED = ("#69707A", "#9AA1A9")
 NAV_HOVER = ("#EEF1F4", "#2A2E34")
